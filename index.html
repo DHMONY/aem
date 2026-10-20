@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بث الحفل العائلي</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #0b0e14;
+      color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 960px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* شاشة القفل */
+    #lockScreen {
+      max-width: 420px;
+      margin: 40px auto;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #38bdf820;
+      color: #38bdf8;
+      border: 1px solid #38bdf840;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: #94a3b8;
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    input[type="password"] {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+
+    input[type="password"]:focus {
+      border-color: #38bdf8;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #0284c7;
+      color: #fff;
+    }
+
+    .error-msg {
+      color: #f87171;
+      font-size: 14px;
+      display: none;
+      margin-top: 8px;
+    }
+
+    /* منطقة البث المباشر */
+    #streamContainer {
+      display: none;
+      width: 100%;
+    }
+
+    .player-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* أبعاد 16:9 */
+      height: 0;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #000;
+      border: 1px solid #334155;
+    }
+
+    .player-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .stream-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 4px;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ef4444;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- شاشة الدخول المقفلة -->
+  <div id="lockScreen" class="card">
+    <div class="badge">مناسبة خاصة</div>
+    <h1>أهلاً بكم في البث المباشر</h1>
+    <p>يرجى إدخال رمز المرور لمتابعة الحفل</p>
+
+    <div class="input-group">
+      <input type="password" id="passInput" placeholder="••••" maxlength="8">
+      <button onclick="unlockStream()">دخول</button>
+    </div>
+    <div id="errorText" class="error-msg">الرمز غير صحيح، حاول مجدداً.</div>
+  </div>
+
+  <!-- حاوية مشغل البث (تفتح بعد إدخال الرمز) -->
+  <div id="streamContainer" class="card">
+    <div class="stream-header">
+      <div class="live-indicator">
+        <span class="dot"></span> مباشر الآن
+      </div>
+      <h2>حفل العائلة المبارك</h2>
+    </div>
+
+    <div class="player-wrapper">
+      <iframe id="twitchPlayer" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script>
+    // --- التعديلات المطلوبة منك ---
+    const SECRET_CODE = "2026"; // اكتب الرمز السري الذي تريده هنا
+    const TWITCH_CHANNEL = "dhmonyy"; // ضع اسم مستخدم حسابك في تويتش هنا
+    // ----------------------------
+
+    function unlockStream() {
+      const input = document.getElementById("passInput").value.trim();
+      const errorText = document.getElementById("errorText");
+
+      if (input === SECRET_CODE) {
+        // إخفاء شاشة القفل وإظهار البث
+        document.getElementById("lockScreen").style.display = "none";
+        document.getElementById("streamContainer").style.display = "block";
+
+        // تحديد نطاق الموقع الحالي تلقائياً لتشغيل مشغل تويتش دون مشاكل Parent
+        const currentDomain = window.location.hostname || "localhost";
+        const iframe = document.getElementById("twitchPlayer");
+
+        // بناء رابط المشغل
+        iframe.src = `https://player.twitch.tv/?channel=${TWITCH_CHANNEL}&parent=${currentDomain}&autoplay=true`;
+      } else {
+        errorText.style.display = "block";
+      }
+    }
+
+    // السماح بالدخول عبر زر Enter
+    document.getElementById("passInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        unlockStream();
+      }
+    });
+  </script>
+</body>
+</html>
