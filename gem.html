@@ -1,0 +1,3609 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="خطة الالتزام">
+    <title>خطة الشهر - متابعة الوجبات والتمارين والخطوات وسجل الإنجاز</title>
+    <style>
+        :root {
+            --primary: #f97316;
+            --primary-hover: #ea580c;
+            --bg-dark: #090e17;
+            --card-bg: #131c2d;
+            --card-sub: #1b263b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #26364f;
+            --accent: #38bdf8;
+            --success: #22c55e;
+            --purple: #a855f7;
+            --amber: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px 15px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .motivation-banner {
+            background: linear-gradient(90deg, rgba(249, 115, 22, 0.15), rgba(56, 189, 248, 0.15));
+            border: 1px solid var(--border-color);
+            border-right: 4px solid var(--primary);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .motivation-text {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #f8fafc;
+            line-height: 1.4;
+        }
+
+        .motivation-sub {
+            font-size: 0.88rem;
+            color: var(--accent);
+            margin-top: 4px;
+        }
+
+        .sync-card {
+            background: linear-gradient(135deg, #111a2e, #182238);
+            border: 1px dashed var(--accent);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .sync-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .check-item {
+            background: var(--card-sub);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .check-item:hover {
+            border-color: var(--accent);
+        }
+
+        .check-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--success);
+            cursor: pointer;
+        }
+
+        .check-item.done {
+            background: rgba(34, 197, 94, 0.12);
+            border-color: var(--success);
+        }
+
+        .check-item.done span {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .check-item-input {
+            cursor: default;
+            justify-content: space-between;
+        }
+
+        .steps-input-box {
+            width: 95px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            background: #090e17;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .steps-input-box:focus {
+            border-color: var(--accent);
+        }
+
+        .daily-meals-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .daily-meal-box {
+            background: var(--card-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .daily-meal-box label {
+            display: block;
+            font-size: 0.92rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .daily-meal-box textarea {
+            width: 100%;
+            height: 60px;
+            background: #090e17;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: #fff;
+            font-size: 0.88rem;
+            resize: vertical;
+            outline: none;
+        }
+
+        .daily-meal-box textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .tabs {
+            position: sticky;
+            top: max(8px, env(safe-area-inset-top));
+            z-index: 30;
+            display: flex;
+            gap: 4px;
+            margin: 0 0 22px;
+            padding: 6px;
+            background: rgba(15, 23, 42, 0.82);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            overflow-x: auto;
+            scroll-snap-type: x proximity;
+            scrollbar-width: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+        }
+
+        .tabs::-webkit-scrollbar { display: none; }
+
+        .tab-ind {
+            position: absolute;
+            top: 6px;
+            bottom: 6px;
+            left: 0;
+            width: 0;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            box-shadow: 0 4px 16px rgba(56, 189, 248, 0.38);
+            transition: left 0.38s cubic-bezier(.2, .8, .2, 1), width 0.38s cubic-bezier(.2, .8, .2, 1);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .tab-btn {
+            position: relative;
+            z-index: 1;
+            flex: 1 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: transparent;
+            border: 0;
+            color: var(--text-muted);
+            padding: 10px 16px;
+            border-radius: 13px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            white-space: nowrap;
+            scroll-snap-align: center;
+            transition: color 0.25s ease, transform 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .tab-btn .ti { font-size: 1.3rem; line-height: 1; }
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn:active { transform: scale(0.95); }
+        .tab-btn.active { color: #04111f; }
+
+        .section-content { display: none; }
+
+        .section-content.active {
+            display: block;
+            animation: tabIn 0.4s cubic-bezier(.2, .8, .2, 1);
+        }
+        .section-content.from-left { animation-name: tabInL; }
+        .section-content.from-right { animation-name: tabInR; }
+
+        @keyframes tabIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        @keyframes tabInL { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+        @keyframes tabInR { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (prefers-reduced-motion: reduce) {
+            .section-content.active { animation: none; }
+            .tab-ind { transition: none; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 22px;
+            border: 1px solid var(--border-color);
+        }
+
+        .diet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin-top: 12px;
+        }
+
+        .meal-card {
+            background: var(--card-sub);
+            border-radius: 10px;
+            padding: 16px;
+            border-top: 4px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .meal-card h4 {
+            color: var(--primary);
+            font-size: 1.05rem;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .meal-items {
+            list-style: none;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            margin-bottom: 12px;
+        }
+
+        .meal-items li {
+            margin-bottom: 6px;
+            position: relative;
+            padding-right: 15px;
+        }
+
+        .meal-items li::before {
+            content: "•";
+            color: var(--accent);
+            position: absolute;
+            right: 0;
+            font-weight: bold;
+        }
+
+        /* تنسيق جدول التمارين المنزلية */
+        .equipment-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 14px 0 20px 0;
+        }
+
+        .equip-pill {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .workout-week-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 15px;
+        }
+
+        .workout-day-card {
+            background: var(--card-sub);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--accent);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .workout-day-card.rest-card {
+            border-top-color: var(--amber);
+            background: rgba(27, 38, 59, 0.75);
+        }
+
+        .workout-day-card.today-highlight {
+            border: 2px solid var(--success);
+            border-top: 5px solid var(--success);
+            box-shadow: 0 0 18px rgba(34, 197, 94, 0.18);
+        }
+
+        .today-badge {
+            display: none;
+            background: var(--success);
+            color: #090e17;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 9px;
+            border-radius: 12px;
+        }
+
+        .workout-day-card.today-highlight .today-badge {
+            display: inline-block;
+        }
+
+        .workout-day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .workout-day-title {
+            font-size: 1.12rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .workout-focus {
+            font-size: 0.92rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .workout-equip-tag {
+            display: inline-block;
+            background: rgba(249, 115, 22, 0.15);
+            color: #fdba74;
+            border: 1px solid rgba(249, 115, 22, 0.35);
+            font-size: 0.78rem;
+            padding: 3px 9px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .workout-list {
+            list-style: none;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            margin-bottom: 14px;
+        }
+
+        .workout-list li {
+            margin-bottom: 7px;
+            padding-right: 16px;
+            position: relative;
+            line-height: 1.45;
+        }
+
+        .workout-list li::before {
+            content: "⚡";
+            position: absolute;
+            right: 0;
+            font-size: 0.78rem;
+        }
+
+        .workout-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .weeks-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .week-box {
+            background: var(--card-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .week-box h3 {
+            color: var(--amber);
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .week-box p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .day-box {
+            background: var(--card-sub);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 8px;
+            padding: 10px 0;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .day-box:hover {
+            border-color: var(--accent);
+        }
+
+        .day-box.done {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .progress-bar-container {
+            background: var(--card-sub);
+            border-radius: 10px;
+            height: 16px;
+            width: 100%;
+            overflow: hidden;
+            margin: 10px 0 15px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .calc-input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .calc-input-group input {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--card-sub);
+            color: #fff;
+            outline: none;
+        }
+
+        .calc-input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .calc-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calc-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .calc-res {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #11271e;
+            border: 1px solid var(--success);
+            color: #86efac;
+            font-weight: bold;
+            display: none;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 230px;
+            background: var(--card-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin: 15px 0;
+            padding: 10px;
+        }
+
+        .data-table-wrapper {
+            max-height: 480px;
+            overflow-y: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .data-table th, .data-table td {
+            padding: 9px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .data-table th {
+            color: var(--text-muted);
+        }
+
+        .badge-task {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            margin: 2px 2px;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .badge-task.badge-success {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .reminder-banner {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid #ef4444;
+            border-right: 4px solid #ef4444;
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: none;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reminder-banner.show {
+            display: flex;
+        }
+
+        .reminder-banner strong {
+            color: #fca5a5;
+        }
+
+        .reminder-list {
+            font-size: 0.92rem;
+            color: #fecaca;
+            line-height: 1.7;
+        }
+
+        .streak-badges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .streak-badge {
+            background: var(--card-sub);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .streak-badge .streak-val {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .streak-badge .streak-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .backup-status {
+            font-size: 0.8rem;
+            margin-top: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .backup-status.ok {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+        }
+
+        .backup-status.warn {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        .meal-log-item {
+            margin-bottom: 3px;
+            font-size: 0.83rem;
+            line-height: 1.4;
+        }
+
+        .meal-log-item strong {
+            color: var(--accent);
+        }
+
+        footer.app-footer {
+            margin-top: 30px;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, #131c2d, #0f172a);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        footer.app-footer strong {
+            color: var(--primary);
+        }
+
+        footer.app-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 6px;
+        }
+
+        footer.app-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .data-table thead {
+                display: none;
+            }
+            .data-table, .data-table tbody, .data-table tr, .data-table td {
+                display: block;
+                width: 100%;
+            }
+            .data-table tr {
+                background: var(--card-sub);
+                border: 1px solid var(--border-color);
+                border-radius: 10px;
+                margin-bottom: 10px;
+                padding: 10px 12px;
+            }
+            .data-table td {
+                border-bottom: none;
+                padding: 6px 0;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                text-align: right;
+            }
+            .data-table td::before {
+                content: attr(data-label);
+                color: var(--text-muted);
+                font-size: 0.8rem;
+                font-weight: 600;
+            }
+        }
+
+        /* تحسينات لظهور كل البيانات والجداول في تصدير PDF */
+        .print-mode .sync-card,
+        .print-mode .tabs,
+        .print-mode .tab-btn,
+        .print-mode .reminder-banner,
+        .print-mode #bt-status,
+        .print-mode #pdf-status,
+        .print-mode input[type="file"],
+        .print-mode .calc-input-group,
+        .print-mode .calc-btn,
+        .print-mode .action-col {
+            display: none !important;
+        }
+        .print-mode .section-content {
+            display: block !important;
+        }
+        .print-mode .card,
+        .print-mode .workout-day-card {
+            background: #fff !important;
+            border: 1px solid #ccc !important;
+            color: #111 !important;
+            box-shadow: none !important;
+        }
+        .print-mode .workout-list li,
+        .print-mode .workout-day-title,
+        .print-mode .workout-focus {
+            color: #111 !important;
+        }
+        .print-mode, .print-mode body, body.print-mode {
+            background: #fff !important;
+            color: #111 !important;
+        }
+        .print-mode .data-table-wrapper {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        .print-mode .data-table thead {
+            display: table-header-group !important;
+        }
+        .print-mode .data-table, .print-mode .data-table tbody, .print-mode .data-table tr, .print-mode .data-table td {
+            display: revert !important;
+            width: auto !important;
+        }
+        .print-mode .data-table td::before {
+            content: none !important;
+        }
+        .print-mode .data-table th, .print-mode .data-table td {
+            color: #111 !important;
+            border-color: #ccc !important;
+        }
+        .print-mode #weightCanvas {
+            display: none !important;
+        }
+        .print-mode #weightChartPrintImg {
+            display: block !important;
+            max-width: 100%;
+        }
+        .print-mode #stepsCanvas {
+            display: none !important;
+        }
+        .print-mode #stepsChartPrintImg {
+            display: block !important;
+            max-width: 100%;
+        }
+
+        @media print {
+            body {
+                background: #fff !important;
+                color: #111 !important;
+            }
+            .sync-card,
+            .tabs,
+            .tab-btn,
+            .reminder-banner,
+            #bt-status,
+            #pdf-status,
+            input[type="file"],
+            .calc-input-group,
+            .calc-btn,
+            .action-col {
+                display: none !important;
+            }
+            .data-table-wrapper {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            .section-content {
+                display: block !important;
+                page-break-after: always;
+            }
+            .section-content:last-of-type {
+                page-break-after: auto;
+            }
+            .card {
+                display: none !important;
+            }
+            .pdf-data-block {
+                display: block !important;
+                background: #fff !important;
+                border: 1px solid #ccc !important;
+                color: #111 !important;
+                box-shadow: none !important;
+            }
+            .workout-day-card {
+                background: #fff !important;
+                border: 1px solid #ccc !important;
+                color: #111 !important;
+            }
+            .workout-list li,
+            .workout-day-title,
+            .workout-focus {
+                color: #111 !important;
+            }
+            .data-table thead {
+                display: table-header-group !important;
+            }
+            .data-table, .data-table tbody, .data-table tr, .data-table td {
+                display: revert !important;
+                width: auto !important;
+            }
+            .data-table td::before {
+                content: none !important;
+            }
+            .data-table th, .data-table td {
+                color: #111 !important;
+                border-color: #ccc !important;
+            }
+            #weightCanvas {
+                display: none !important;
+            }
+            #weightChartPrintImg {
+                display: block !important;
+            }
+            #stepsCanvas {
+                display: none !important;
+            }
+            #stepsChartPrintImg {
+                display: block !important;
+                max-width: 100%;
+            }
+        }
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1b263b;color:#fff;border:1px solid var(--accent);padding:10px 18px;border-radius:10px;z-index:99;display:none;max-width:90%;text-align:center;font-size:.9rem}
+.workout-meta button:disabled{opacity:.35;cursor:not-allowed}
+#meals_note{grid-column:1/-1;display:none;font-size:.85rem;color:var(--success);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);border-radius:10px;padding:8px 12px}
+.sg-hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:linear-gradient(135deg,rgba(34,197,94,.16),rgba(59,130,246,.10));border:1px solid var(--border-color);border-radius:18px;padding:18px}
+.sg-ring-wrap{position:relative;width:132px;height:132px;flex:none}
+.sg-ring{width:100%;height:100%;transform:rotate(-90deg)}
+.sg-ring-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:9}
+.sg-ring-fg{fill:none;stroke:var(--success);stroke-width:9;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1)}
+.sg-ring-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sg-streak{font-size:2.5rem;font-weight:800;line-height:1;color:var(--success)}
+.sg-streak-l{font-size:.75rem;color:var(--text-muted);margin-top:4px}
+.sg-hero-side{flex:1;min-width:200px}
+.sg-today{width:100%;margin-top:12px;padding:13px;border-radius:12px;border:1px solid transparent;font-weight:700;font-size:1rem;cursor:pointer;font-family:inherit;transition:transform .15s,background .2s;background:var(--accent);color:#0b1220}
+.sg-today.done{background:rgba(34,197,94,.18);color:var(--success);border-color:var(--success)}
+.sg-today:active{transform:scale(.97)}
+.sg-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:10px;margin:14px 0}
+.sg-tile{background:var(--card-sub);border:1px solid var(--border-color);border-radius:12px;padding:12px;text-align:center}
+.sg-tile b{display:block;font-size:1.4rem;color:var(--text-main)}
+.sg-tile span{font-size:.74rem;color:var(--text-muted)}
+.sg-next{font-size:.88rem;color:var(--text-muted);margin-bottom:6px}
+.sg-h{margin:18px 0 10px;color:var(--accent);font-size:1rem}
+.sg-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:10px}
+.sg-badge{text-align:center;padding:10px 4px;border-radius:12px;background:var(--card-sub);border:1px solid var(--border-color);opacity:.4;filter:grayscale(1);font-size:.7rem;color:var(--text-muted)}
+.sg-badge i{display:block;font-style:normal;font-size:1.6rem;margin-bottom:2px}
+.sg-badge.on{opacity:1;filter:none;border-color:var(--amber);color:var(--amber)}
+.sg-cal-head{display:flex;justify-content:space-between;align-items:center;margin:0 0 8px}
+.sg-cal-head button{background:var(--card-sub);border:1px solid var(--border-color);color:var(--text-main);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:1.2rem}
+.sg-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.sg-wd{text-align:center;font-size:.72rem;color:var(--text-muted)}
+.sg-d{height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;background:var(--card-sub);border:1px solid transparent;color:var(--text-muted);cursor:pointer;user-select:none;transition:transform .15s,background .2s}
+.sg-d.off{opacity:.25;cursor:default}
+.sg-d.miss{border-color:rgba(239,68,68,.35);color:#f87171}
+.sg-d.done{background:rgba(34,197,94,.22);color:var(--success);border-color:var(--success)}
+.sg-d.today{outline:2px solid var(--accent);outline-offset:1px}
+.sg-d.pop{animation:sgpop .35s}
+.sg-d:not(.off):active{transform:scale(.9)}
+@keyframes sgpop{0%{transform:scale(.7)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+.sg-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.74rem;color:var(--text-muted);margin-top:10px}
+.sg-foot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--border-color);font-size:.85rem;color:var(--text-muted)}
+.sg-foot input{background:#090e17;border:1px solid var(--border-color);color:#fff;border-radius:6px;padding:4px 8px}
+.lg-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.lg-top h2{margin:0 0 4px;color:var(--text-main);font-size:1.2rem}
+.lg-top p{margin:0;color:var(--text-muted);font-size:.85rem}
+.lg-actions{display:flex;gap:8px;flex-wrap:wrap}
+.lg-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.lg-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.lg-toolbar select{background:#090e17;color:#fff;border:1px solid var(--border-color);border-radius:10px;padding:9px 12px;font-size:.9rem;outline:none;min-width:170px}
+.lg-chips{display:flex;gap:6px;flex-wrap:wrap}
+.lg-chip{background:var(--card-sub);border:1px solid var(--border-color);color:var(--text-muted);border-radius:20px;padding:7px 14px;font-size:.82rem;cursor:pointer;font-family:inherit}
+.lg-chip.on{background:var(--accent);color:#0b1220;border-color:var(--accent);font-weight:700}
+.lg-month{display:flex;justify-content:space-between;align-items:center;margin:18px 0 8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.04);font-size:.86rem;color:var(--text-muted)}
+.lg-month b{color:var(--text-main)}
+.lg-card{display:flex;gap:12px;align-items:flex-start;background:var(--card-sub);border:1px solid var(--border-color);border-right:4px solid var(--c,var(--accent));border-radius:14px;padding:12px;margin-bottom:10px}
+.lg-date{flex:none;width:54px;text-align:center;border-radius:10px;background:rgba(255,255,255,.05);padding:7px 0}
+.lg-date b{display:block;font-size:1.3rem;color:var(--text-main);line-height:1.1}
+.lg-date span{font-size:.68rem;color:var(--text-muted)}
+.lg-body{flex:1;min-width:0}
+.lg-row1{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--text-muted)}
+.lg-pct{font-weight:800;font-size:1.1rem}
+.lg-bar{height:6px;border-radius:6px;background:rgba(255,255,255,.08);margin:6px 0 8px;overflow:hidden}
+.lg-bar i{display:block;height:100%;border-radius:6px}
+.lg-metrics{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.lg-m{font-size:.75rem;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--text-main)}
+.lg-m.ok{background:rgba(34,197,94,.15);color:var(--success)}
+.lg-meals{margin-top:8px;font-size:.83rem}
+.lg-meals summary{cursor:pointer;color:var(--accent);font-weight:600}
+.lg-acts{display:flex;flex-direction:column;gap:6px}
+.lg-acts button{background:rgba(255,255,255,.06);border:1px solid var(--border-color);color:var(--text-main);border-radius:8px;width:34px;height:34px;cursor:pointer}
+    </style>
+</head>
+<body>
+<div id="toast"></div>
+
+<div class="container">
+    <header>
+        <h1>برنامج الالتزام والتنحيف اليومي</h1>
+        <p>متابعة التمارين المنزلية، الوجبات، الصيام المتقطع، قطع السكريات، وسجل الإنجاز الشهري للوصول إلى هدفك</p>
+
+        <div class="stats-grid">
+            <div class="stat-box" id="monthly-goal-box">
+                <div class="stat-val" id="header-monthly-goal">86 ⬅ 80 كجم</div>
+                <div class="stat-label">🎯 هدف الشهر</div>
+                <a href="javascript:void(0)" onclick="toggleMonthlyGoalEdit()" style="display:inline-block; margin-top:4px; font-size:0.72rem; color:var(--accent); text-decoration:underline;">⚙️ تعديل الهدف</a>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val" id="header-water">2.5 – 3 لتر</div>
+                <div class="stat-label">💧 استهلاك الماء</div>
+                <a href="javascript:void(0)" onclick="toggleStatEdit('water')" style="display:inline-block; margin-top:4px; font-size:0.72rem; color:var(--accent); text-decoration:underline;">⚙️ تعديل الهدف</a>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val" id="header-steps-goal">≥ 5,000</div>
+                <div class="stat-label">🚶‍♂️ خطوات يومية</div>
+                <a href="javascript:void(0)" onclick="toggleStatEdit('steps')" style="display:inline-block; margin-top:4px; font-size:0.72rem; color:var(--accent); text-decoration:underline;">⚙️ تعديل الهدف</a>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val" id="header-sugar-days">30 يوماً</div>
+                <div class="stat-label">🚫 تحدي السكر والغازيات</div>
+                <span style="display:inline-block; margin-top:4px; font-size:0.72rem; color:var(--text-muted);">تحدي مستمر ♾️</span>
+            </div>
+        </div>
+
+        <div id="monthly-goal-edit-box" style="display:none; margin-top:16px; padding:14px; background:rgba(255,255,255,0.04); border:1px dashed var(--accent); border-radius:12px;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
+                <label style="font-size:0.9rem; color:var(--text-muted);">من (كجم)</label>
+                <input type="number" step="0.1" id="goal-from-input" style="width:90px; padding:6px 8px; border-radius:6px; background:#090e17; border:1px solid var(--border-color); color:#fff; text-align:center;">
+                <span style="color:var(--text-muted);">⬅</span>
+                <label style="font-size:0.9rem; color:var(--text-muted);">إلى (كجم)</label>
+                <input type="number" step="0.1" id="goal-to-input" style="width:90px; padding:6px 8px; border-radius:6px; background:#090e17; border:1px solid var(--border-color); color:#fff; text-align:center;">
+                <button class="calc-btn" style="background:var(--success); padding:6px 14px; font-size:0.85rem;" onclick="saveMonthlyGoal()">حفظ ✅</button>
+                <button class="calc-btn" style="background:#6b7280; padding:6px 14px; font-size:0.85rem;" onclick="toggleMonthlyGoalEdit()">إلغاء</button>
+            </div>
+        </div>
+
+        <div id="edit-box-water" style="display:none; margin-top:16px; padding:14px; background:rgba(255,255,255,0.04); border:1px dashed var(--accent); border-radius:12px;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
+                <label style="font-size:0.9rem; color:var(--text-muted);">من (لتر)</label>
+                <input type="number" step="0.1" id="water-from-input" style="width:90px; padding:6px 8px; border-radius:6px; background:#090e17; border:1px solid var(--border-color); color:#fff; text-align:center;">
+                <span style="color:var(--text-muted);">–</span>
+                <label style="font-size:0.9rem; color:var(--text-muted);">إلى (لتر)</label>
+                <input type="number" step="0.1" id="water-to-input" style="width:90px; padding:6px 8px; border-radius:6px; background:#090e17; border:1px solid var(--border-color); color:#fff; text-align:center;">
+                <button class="calc-btn" style="background:var(--success); padding:6px 14px; font-size:0.85rem;" onclick="saveHeaderStat('water')">حفظ ✅</button>
+                <button class="calc-btn" style="background:#6b7280; padding:6px 14px; font-size:0.85rem;" onclick="toggleStatEdit('water')">إلغاء</button>
+            </div>
+        </div>
+
+        <div id="edit-box-steps" style="display:none; margin-top:16px; padding:14px; background:rgba(255,255,255,0.04); border:1px dashed var(--accent); border-radius:12px;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
+                <label style="font-size:0.9rem; color:var(--text-muted);">الهدف اليومي (خطوة)</label>
+                <input type="number" step="100" id="steps-goal-header-input" style="width:110px; padding:6px 8px; border-radius:6px; background:#090e17; border:1px solid var(--border-color); color:#fff; text-align:center;">
+                <button class="calc-btn" style="background:var(--success); padding:6px 14px; font-size:0.85rem;" onclick="saveStepsGoalFromHeader()">حفظ ✅</button>
+                <button class="calc-btn" style="background:#6b7280; padding:6px 14px; font-size:0.85rem;" onclick="toggleStatEdit('steps')">إلغاء</button>
+            </div>
+        </div>
+
+    </header>
+
+    <div class="motivation-banner">
+        <div>
+            <div class="motivation-text" id="quote-text">"الالتزام هو أن تفعل ما يجب عليك فعله، حتى وإن لم تكن ترغب في ذلك."</div>
+            <div class="motivation-sub"><span id="day-counter"></span>🔥 هدفك قريب، ركّز على انتصار اليوم فقط وتذكر سبب بدايتك!</div>
+        </div>
+        <button class="calc-btn" style="padding: 7px 14px; font-size: 0.8rem; background: var(--card-sub); border: 1px solid var(--border-color);" onclick="newQuote()">عبارة أخرى 🎲</button>
+    </div>
+
+    <div class="reminder-banner" id="reminder-banner">
+        <div>
+            <strong>⏰ تذكير سريع:</strong>
+            <div class="reminder-list" id="reminder-list"></div>
+        </div>
+    </div>
+
+    <div class="sync-card">
+        <div>
+            <strong style="color:var(--accent); font-size:1.05rem;">🔄 مشاركة البيانات واستخراج التقرير</strong>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-top:2px;">
+                يمكنك حفظ تقريرك الشامل كـ PDF بكافة الأيام والأوزان المسجلة.
+            </p>
+            <span class="backup-status" id="backup-status">لم يتم إنشاء نسخة احتياطية بعد</span>
+        </div>
+        <div class="sync-actions">
+            <button class="calc-btn" style="background:var(--purple); padding:8px 14px; font-size:0.85rem;" onclick="generatePDFDirect()">📥 تحميل تقرير PDF (شامل كل الأيام والأوزان)</button>
+            <button class="calc-btn" style="background:#6b7280; padding:8px 14px; font-size:0.8rem;" onclick="printReport()">🖨️ طباعة عادية (كمبيوتر)</button>
+            <div id="pdf-status" style="font-size:0.85rem; margin-top:8px; color:var(--text-muted);"></div>
+            <button class="calc-btn" style="background:#0284c7; padding:8px 14px; font-size:0.85rem;" onclick="exportFitnessData()">📤 تصدير نسخة (JSON)</button>
+            <button class="calc-btn" style="background:#1e293b; border:1px solid var(--accent); padding:8px 14px; font-size:0.85rem;" onclick="document.getElementById('importFile').click()">📥 استيراد نسخة من جهاز آخر</button>
+            <input type="file" id="importFile" style="display:none;" onchange="importFitnessData(event)" accept=".json">
+        </div>
+    </div>
+
+    <!-- بطاقة المهام اليومية -->
+    <div class="card" id="daily-tasks-card" style="border: 1px solid var(--accent);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <h2 style="color: var(--accent); margin: 0; font-size: 1.3rem;">✅ مهامي ووجباتي لليوم</h2>
+                <input type="date" id="checklist-date" onchange="onDateChanged()" style="background:#090e17; border:1px solid var(--border-color); color:#fff; border-radius:6px; padding:4px 8px; margin-top:6px; font-size:0.85rem;" />
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button class="calc-btn" style="background:var(--success); font-size:0.85rem; padding:8px 14px;" onclick="saveDayToMonthlyLog()">💾 حفظ اليوم في سجل الشهر</button>
+                <button class="calc-btn" style="background:#2b3e5e; font-size:0.85rem; padding:8px 14px;" onclick="resetDailyChecklist()">تصفير اليوم 🔄</button>
+            </div>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">علّم على المهام واكتب عدد خطواتك ووزنك، ثم اضغط على "حفظ اليوم":</p>
+
+        <div class="checklist-grid">
+            <label class="check-item" id="item_restday" style="border-color:var(--amber);">
+                <input type="checkbox" id="chk_restday" onchange="toggleRestDay()">
+                <span>🛌 اليوم يوم راحة (بدون تمرين)</span>
+            </label>
+
+            <label class="check-item" id="item_fasting" style="display:none"><input type="checkbox" id="chk_fasting"></label>
+            <div id="meals_note"></div>
+
+            <label class="check-item" id="item_workout">
+                <input type="checkbox" id="chk_workout" onchange="toggleCheckItem('chk_workout')">
+                <span>🏋️‍♂️ تمرنت اليوم</span>
+            </label>
+
+            <!-- خانة كتابة الخطوات -->
+            <div class="check-item check-item-input" id="item_steps">
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                    <span id="steps_label_txt">🚶‍♂️ تحقيق هدف الخطوات:</span>
+                    <small id="steps_sub_goal_txt" style="font-size:0.75rem; color:var(--text-muted);">(الهدف: 5,000)</small>
+                    <a href="javascript:void(0)" onclick="goToStepsGoal()" style="font-size:0.72rem; color:var(--accent); text-decoration:underline;">⚙️ تعديل الهدف</a>
+                </div>
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <input type="number" id="input_steps_count" class="steps-input-box" placeholder="0" oninput="onStepsInputChanged()">
+                    <span style="font-size:0.8rem; color:var(--text-muted);">خطوة</span>
+                </div>
+            </div>
+
+            <!-- خانة تسجيل الوزن السريع في نفس البطاقة -->
+            <div class="check-item check-item-input" id="item_weight_quick">
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                    <span>⚖️ وزن اليوم (اختياري):</span>
+                    <small style="font-size:0.75rem; color:var(--text-muted);">يُحفظ تلقائياً في سجل الوزن</small>
+                </div>
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <input type="number" step="0.1" id="input_daily_weight_quick" class="steps-input-box" placeholder="86.0" oninput="onQuickWeightChanged()">
+                    <span style="font-size:0.8rem; color:var(--text-muted);">كجم</span>
+                </div>
+            </div>
+
+            <div class="check-item check-item-input"><div><span>🥩 بروتين اليوم (جم):</span><br><small id="protein_hint" style="font-size:.75rem;color:var(--text-muted)"></small></div><input type="number" id="input_protein" class="steps-input-box" placeholder="0" oninput="onNutritionChanged()"></div>
+            <div class="check-item check-item-input"><span>🔥 سعرات اليوم (اختياري):</span><input type="number" id="input_kcal" class="steps-input-box" placeholder="0" oninput="onNutritionChanged()"></div>
+            <div class="check-item check-item-input"><div><span>🥤 أكواب الماء (250 مل):</span><br><small id="water_hint" style="font-size:.75rem;color:var(--text-muted)"></small></div><div style="display:flex;gap:8px;align-items:center"><button class="calc-btn" style="padding:4px 12px" onclick="changeWater(-1)">−</button><strong id="water_glasses_txt">0</strong><button class="calc-btn" style="padding:4px 12px" onclick="changeWater(1)">+</button><input type="hidden" id="input_water_glasses" value="0"></div></div>
+            <label class="check-item" id="item_breakfast">
+                <input type="checkbox" id="chk_breakfast" onchange="toggleCheckItem('chk_breakfast')">
+                <span>🍳 تناولت الفطور</span>
+            </label>
+
+            <label class="check-item" id="item_lunch">
+                <input type="checkbox" id="chk_lunch" onchange="toggleCheckItem('chk_lunch')">
+                <span>🍗 تناولت الغداء</span>
+            </label>
+
+            <label class="check-item" id="item_dinner">
+                <input type="checkbox" id="chk_dinner" onchange="toggleCheckItem('chk_dinner')">
+                <span>🌯 تناولت العشاء</span>
+            </label>
+
+            <label class="check-item" id="item_water">
+                <input type="checkbox" id="chk_water" onchange="toggleCheckItem('chk_water')">
+                <span id="water_task_label">💧 شربت 2.5 - 3 لتر ماء</span>
+            </label>
+
+            <label class="check-item" id="item_sugar">
+                <input type="checkbox" id="chk_sugar" onchange="toggleCheckItem('chk_sugar')">
+                <span>🚫 بدون سكر أو غازيات</span>
+            </label>
+        </div>
+
+        <h3 style="color: var(--primary); font-size: 1rem; margin-top: 15px;">📝 اكتب تفاصيل ما تناولته اليوم:</h3>
+        <div class="daily-meals-inputs">
+            <div class="daily-meal-box">
+                <label>🍳 الفطور:</label>
+                <textarea id="meal_breakfast_txt" placeholder="مثال: 3 بيضات، 2 توست بر، خيار وطماطم... (أو صائم 16/8)" oninput="autoSaveCurrentInputs()"></textarea>
+            </div>
+
+            <div class="daily-meal-box">
+                <label>🍗 الغداء:</label>
+                <textarea id="meal_lunch_txt" placeholder="مثال: 200 جم صدور دجاج، رز أبيض، سلطة خضراء..." oninput="autoSaveCurrentInputs()"></textarea>
+            </div>
+
+            <div class="daily-meal-box">
+                <label>🌯 العشاء:</label>
+                <textarea id="meal_dinner_txt" placeholder="مثال: علبة تونة مصفاة، خبز بر، زبادي خفيف..." oninput="autoSaveCurrentInputs()"></textarea>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 10px;">
+            <span>نسبة إنجاز اليوم: <strong id="daily-progress-txt" style="color: var(--success);">0%</strong></span>
+            <span id="daily-status-msg" style="color: var(--text-muted);">ابدأ يومك بقوة!</span>
+        </div>
+        <div class="progress-bar-container" style="height: 10px; margin-top: 6px;">
+            <div class="progress-bar-fill" id="daily-progress-bar"></div>
+        </div>
+    </div>
+
+    <nav class="tabs" role="tablist">
+        <div class="tab-ind" id="tab-ind"></div>
+        <button class="tab-btn active" role="tab" aria-selected="true" data-tab="month-log" onclick="switchTab('month-log')"><span class="ti">📅</span><span>سجل الإنجاز</span></button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="workout-schedule" onclick="switchTab('workout-schedule')"><span class="ti">🏋️</span><span>التمارين المنزلية</span></button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="sugar-challenge" onclick="switchTab('sugar-challenge')"><span class="ti">🚫</span><span>تحدي السكر</span></button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="weight-tracker" onclick="switchTab('weight-tracker')"><span class="ti">⚖️</span><span>الوزن والإحصائيات</span></button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="diet" onclick="switchTab('diet')"><span class="ti">🍽️</span><span>الوجبات المقترحة</span></button>
+        <button class="tab-btn" role="tab" aria-selected="false" data-tab="plan" onclick="switchTab('plan')"><span class="ti">📈</span><span>مراحل التطور</span></button>
+    </nav>
+
+    <!-- 1. سجل إنجاز الشهر -->
+    <main id="month-log" class="section-content active">
+        <div class="card pdf-data-block">
+            <div class="lg-top">
+                <div>
+                    <h2>📅 سجل الالتزام والأرشيف</h2>
+                    <p>كل يوم تحفظه يظهر هنا مع نسبة الالتزام والمهام والوجبات.</p>
+                </div>
+                <div class="lg-actions">
+                    <button class="calc-btn" style="background:var(--accent); font-size:0.8rem; padding:6px 12px;" onclick="startNewMonth()">🆕 ابدأ شهر جديد</button>
+                    <button class="calc-btn" style="background:#ef4444; font-size:0.8rem; padding:6px 12px;" onclick="clearMonthlyLog()">مسح السجل 🗑️</button>
+                </div>
+            </div>
+            <div class="lg-kpis">
+                <div class="sg-tile"><b id="log-total-days">0</b><span>📆 الأيام المسجلة</span></div>
+                <div class="sg-tile"><b id="log-perfect-days" style="color:var(--success)">0</b><span>✅ أيام كاملة (100%)</span></div>
+                <div class="sg-tile"><b id="log-avg-pct" style="color:var(--amber)">0%</b><span>📈 متوسط الالتزام</span></div>
+                <div class="sg-tile"><b><span id="log-current-streak" style="color:var(--success)">0</span> / <span id="log-best-streak" style="color:var(--amber)">0</span></b><span>🔥 السلسلة الحالية / الأفضل</span></div>
+            </div>
+            <div class="lg-toolbar">
+                <select id="log-month-filter" onchange="onMonthFilterChange()">
+                    <option value="all">كل الأشهر</option>
+                </select>
+                <div class="lg-chips">
+                    <button class="lg-chip on" data-m="all" onclick="setLogMode('all')">الكل</button>
+                    <button class="lg-chip" data-m="perfect" onclick="setLogMode('perfect')">✅ كاملة</button>
+                    <button class="lg-chip" data-m="low" onclick="setLogMode('low')">⚠️ تحتاج متابعة</button>
+                </div>
+            </div>
+            <div id="log-cards"></div>
+        </div>
+    </main>
+
+    <!-- 2. جدول التمارين المنزلية الأسبوعي (مفصل حسب الأجهزة الفعلية) -->
+    <main id="workout-schedule" class="section-content">
+        <div class="card pdf-data-block">
+            <h2 style="color: var(--primary); margin-bottom: 6px;">🏋️‍♂️ جدول التمارين المنزلية الأسبوعي (مفصل على أجهزتك)</h2>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">
+                جدول متكامل مصمم خصيصاً على معداتك المنزلية لحرق الدهون وشد العضلات للوصول من <span class="dyn-from">86</span> إلى <span class="dyn-to">80</span> كجم:
+            </p>
+
+            <div class="equipment-badges">
+                <span class="equip-pill">🚴‍♂️ جهاز أوبتكال ودراجة 2×1 (Elliptical & Bike)</span>
+                <span class="equip-pill">🏋️‍♂️ شنطة حديد ودامبلز (20 كجم)</span>
+                <span class="equip-pill">➰ حبال شد ومقاومة (PROIRON)</span>
+                <span class="equip-pill">🪜 منصة ستيب هوائية (Aerobic Stepper)</span>
+            </div>
+
+            <div class="workout-week-grid">
+                <!-- السبت: day index 6 -->
+                <div class="workout-day-card" data-day="6">
+                    <div>
+                        <div class="workout-day-header">
+                            <span class="workout-day-title">📅 السبت</span>
+                            <span class="today-badge">🔥 تمرين اليوم</span>
+                        </div>
+                        <div class="workout-focus">💪 صدر + أكتاف + ترايسبس + أوبتكال</div>
+                        <span class="workout-equip-tag">🏋️‍♂️ الدامبلز + ➰ حبل الشد + 🪜 الستيب + 🚴‍♂️ أوبتكال</span>
+                        <ul class="workout-list">
+                            <li><strong>إحماء (5 دقائق):</strong> على جهاز الأوبتكال (وضع الوقوف لتحريك الجسم).</li>
+                            <li><strong>ضغط صدر بالدامبلز (Floor/Step Press):</strong> مستلقياً ظهرك على منصة الستيب أو الأرض (3 جولات × 12 عدّة).</li>
+                            <li><strong>تفتيح صدر بحبل الشد (Band Chest Fly):</strong> ثبت الحبل خلف ظهرك واسحب للأمام (3 جولات × 15 عدّة).</li>
+                            <li><strong>ضغط أكتاف بالدامبلز (Shoulder Press):</strong> جالساً أو واقفاً (3 جولات × 12 عدّة).</li>
+                            <li><strong>رفرفة أكتاف جانبي بالدامبلز:</strong> (3 جولات × 12-15 عدّة).</li>
+                            <li><strong>ترايسبس بحبل الشد أو الدامبل خلف الرأس:</strong> (3 جولات × 12-15 عدّة).</li>
+                            <li><strong>كارديو ختامي (15-20 دقيقة):</strong> على جهاز الأوبتكال (وضع الوقوف مع تحريك الذراعين).</li>
+                        </ul>
+                    </div>
+                    <div class="workout-meta">
+                        <span>⏱️ المدة: 45–50 دقيقة</span>
+                        <button class="calc-btn" style="padding:5px 12px; font-size:0.78rem; background:var(--success);" onclick="markTodayWorkoutDone(false)">✅ أتممت تمرين اليوم</button>
+                    </div>
+                </div>
+
+                <!-- الأحد: day index 0 -->
+                <div class="workout-day-card" data-day="0">
+                    <div>
+                        <div class="workout-day-header">
+                            <span class="workout-day-title">📅 الأحد</span>
+                            <span class="today-badge">🔥 تمرين اليوم</span>
+                        </div>
+                        <div class="workout-focus">🔙 ظهر + بايسبس + دراجة</div>
+                        <span class="workout-equip-tag">🏋️‍♂️ الدامبلز + ➰ حبل الشد + 🚴‍♂️ الدراجة</span>
+                        <ul class="workout-list">
+                            <li><strong>إحماء (5 دقائق):</strong> على الدراجة (وضع الجلوس بسرعة خفيفة).</li>
+                            <li><strong>منشار ظهر بالدامبل (One-Arm Row):</strong> مع الاستناد بيدك على منصة الستيب (3 جولات × 12 عدّة لكل ذراع).</li>
+                            <li><strong>سحب ظهر جالس بحبل الشد (Seated Band Row):</strong> ثبت الحبل في قدميك واسحب لبطنك مع ضم لوحي الكتف (4 جولات × 15 عدّة).</li>
+                            <li><strong>سحب علوي/خلفي بحبل الشد (Band Pull-Aparts):</strong> لشد أعلى الظهر والأكتاف الخلفية (3 جولات × 15 عدّة).</li>
+                            <li><strong>تبادل بايسبس بالدامبلز (Bicep Curls):</strong> (3 جولات × 12 عدّة).</li>
+                            <li><strong>بايسبس شاكوش بالدامبلز أو حبل الشد:</strong> (3 جولات × 12-15 عدّة).</li>
+                            <li><strong>كارديو ختامي (15-20 دقيقة):</strong> تبديل بين الدراجة جالساً والأوبتكال واقفاً.</li>
+                        </ul>
+                    </div>
+                    <div class="workout-meta">
+                        <span>⏱️ المدة: 45–50 دقيقة</span>
+                        <button class="calc-btn" style="padding:5px 12px; font-size:0.78rem; background:var(--success);" onclick="markTodayWorkoutDone(false)">✅ أتممت تمرين اليوم</button>
+                    </div>
+                </div>
+
+                <!-- الاثنين: day index 1 -->
+                <div class="workout-day-card" data-day="1">
+                    <div>
+                        <div class="workout-day-header">
+                            <span class="workout-day-title">📅 الاثنين</span>
+                            <span class="today-badge">🔥 تمرين اليوم</span>
+                        </div>
+                        <div class="workout-focus">🔥 محرقة الدهون (أوبتكال + دراجة + ستيب + بطن)</div>
+                        <span class="workout-equip-tag">🚴‍♂️ أوبتكال ودراجة + 🪜 منصة الستيب</span>
+                        <ul class="workout-list">
+                            <li><strong>جولة أوبتكال واقفاً (15 دقيقة):</strong> وتيرة متوسطة إلى سريعة لتحريك كامل الجسم.</li>
+                            <li><strong>جولة دراجة جالساً (15 دقيقة):</strong> مقاومة متوسطة لحرق دهون الجزء السفلي.</li>
+                            <li><strong>صعود ونزول على منصة الستيب (Step-Ups):</strong> لرفع نبض القلب وشد الأرجل (3 جولات × دقيقة كاملة).</li>
+                            <li><strong>تمارين بطن (Crunches) + بلانك (Plank):</strong> لشد عضلات البطن والخصر (3 جولات).</li>
+                        </ul>
+                    </div>
+                    <div class="workout-meta">
+                        <span>⏱️ المدة: 40–45 دقيقة</span>
+                        <button class="calc-btn" style="padding:5px 12px; font-size:0.78rem; background:var(--success);" onclick="markTodayWorkoutDone(false)">✅ أتممت تمرين اليوم</button>
+                    </div>
+                </div>
+
+                <!-- الثلاثاء: day index 2 -->
+                <div class="workout-day-card rest-card" data-day="2">
+                    <div>
+                        <div class="workout-day-header">
+                            <span class="workout-day-title" style="color:var(--amber);">📅 الثلاثاء</span>
+                            <span class="today-badge">🛌 يوم راحة</span>
+                        </div>
+                        <div class="workout-focus" style="color:var(--amber);">🛌 راحة واستشفاء عضلي نشط</div>
+                        <span class="workout-equip-tag">🚶‍♂️ خطوات اليوم + ➰ إطالات خفيفة</span>
+                        <ul class="workout-list">
+                            <li>راحة من الحديد والأوبتكال لإعطاء العضلات فرصة للاستشفاء والبناء.</li>
+                            <li>إكمال هدف الخطوات اليومية المعتاد (<span class="dyn-steps">5,000</span> خطوة أو أكثر).</li>
+                            <li>التركيز على شرب الماء الكافي والالتزام بنافذة الصيام المتقطع 16/8.</li>
+                        </ul>
+                    </div>
+                    <div class="workout-meta">
+                        <span>🧘‍♂️ استشفاء تام</span>
+                        <button class="calc-btn" style="padding:5px 12px; font-size:0.78rem; background:var(--amber); color:#090e17;" onclick="markTodayWorkoutDone(true)">🛌 تفعيل يوم راحة</button>
+                    </div>
+                </div>
+
+                <!-- الأربعاء: day index 3 -->
+                <div class="workout-day-card" data-day="3">
+                    <div>
+                        <div class="workout-day-header">
+                            <span class="workout-day-title">📅 الأربعاء</span>
+                            <span class="today-badge">🔥 تمرين اليوم</span>
+                        </div>
+                        <div class="workout-focus">🦵 أرجل + أسفل الجسم + دراجة</div>
+                        <span class="workout-equip-tag">🏋️‍♂️ الدامبلز + 🪜 منصة الستيب + 🚴‍♂️ الدراجة</span>
+                        <ul class="workout-list">
+                            <li><strong>إحماء (5 دقائق):</strong> على الدراجة أو الأوبتكال.</li>
+                            <li><strong>سكوات بالدامبلز (Goblet Squat):</strong> (3 جولات × 12 عدّة).</li>
+                            <li><strong>صعود على منصة الستيب بالدامبلز (Weighted Step-Ups):</strong> (3 جولات × 10 عدّات لكل رجل).</li>
+                            <li><strong>طعن بالدامبلز (Dumbbell Lunges):</strong> (3 جولات × 10 عدّات لكل رجل).</li>
+                            <li><strong>سمانة واقف على حافة منصة الستيب (Calf Raises):</strong> (3 جولات × 15-20 عدّة).</li>
+                            <li><strong>كارديو ختامي (15 دقيقة):</strong> دراجة بوضع الجلوس لضخ الدم في الأرجل وحرق الدهون.</li>
+                        </ul>
+                    </div>
+                    <div class="workout-meta">
+                        <span>⏱️ المدة: 45 دقيقة</span>
+                        <button class="calc-btn" style="padding:5px 12px; font-size:0.78rem; background:var(--success);" onclick="markTodayWorkoutDone(false)">✅ أتممت تمرين اليوم</button>
+                    </div>
+                </div>
+
+                <!-- الخميس: day index 4 -->
+                <div class="workout-day-card" data-day="4">
+                    <div>
+                        <div class="workout-day-header">
+                            <span class="workout-day-title">📅 الخميس</span>
+                            <span class="today-badge">🔥 تمرين اليوم</span>
+                        </div>
+                        <div class="workout-focus">⚡ كوكتيل شامل (حديد + حبل شد + أوبتكال)</div>
+                        <span class="workout-equip-tag">🏋️‍♂️ الدامبلز + ➰ حبل الشد + 🚴‍♂️ أوبتكال</span>
+                        <ul class="workout-list">
+                            <li><strong>ضغط صدر بالدامبلز + سحب ظهر بحبل الشد:</strong> (3 جولات × 12 عدّة لكل تمرين).</li>
+                            <li><strong>ضغط أكتاف بالدامبلز:</strong> (3 جولات × 12 عدّة).</li>
+                            <li><strong>سوبر ست ذراعين:</strong> بايسبس بالدامبلز + ترايسبس بحبل الشد (3 جولات × 12-15 عدّة).</li>
+                            <li><strong>كارديو حرق ختامي (20 دقيقة):</strong> 10 دقائق أوبتكال واقفاً + 10 دقائق دراجة جالساً.</li>
+                        </ul>
+                    </div>
+                    <div class="workout-meta">
+                        <span>⏱️ المدة: 45–50 دقيقة</span>
+                        <button class="calc-btn" style="padding:5px 12px; font-size:0.78rem; background:var(--success);" onclick="markTodayWorkoutDone(false)">✅ أتممت تمرين اليوم</button>
+                    </div>
+                </div>
+
+                <!-- الجمعة: day index 5 -->
+                <div class="workout-day-card rest-card" data-day="5">
+                    <div>
+                        <div class="workout-day-header">
+                            <span class="workout-day-title" style="color:var(--amber);">📅 الجمعة</span>
+                            <span class="today-badge">🛌 يوم راحة</span>
+                        </div>
+                        <div class="workout-focus" style="color:var(--amber);">🛌 راحة أسبوعية واستشفاء</div>
+                        <span class="workout-equip-tag">🚶‍♂️ مشي خفيف ونشاط عائلي</span>
+                        <ul class="workout-list">
+                            <li>يوم راحة من التمارين المنزلية لتجديد النشاط للأسبوع الجديد.</li>
+                            <li>المحافظة على الخطوات اليومية وتجنب السكريات والمشروبات الغازية.</li>
+                        </ul>
+                    </div>
+                    <div class="workout-meta">
+                        <span>🧘‍♂️ راحة الأسبوع</span>
+                        <button class="calc-btn" style="padding:5px 12px; font-size:0.78rem; background:var(--amber); color:#090e17;" onclick="markTodayWorkoutDone(true)">🛌 تفعيل يوم راحة</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 3. تحدي قطع السكريات والغازيات -->
+    <main id="sugar-challenge" class="section-content">
+        <div class="card pdf-data-block">
+            <div class="sg-hero">
+                <div class="sg-ring-wrap">
+                    <svg viewBox="0 0 120 120" class="sg-ring"><circle class="sg-ring-bg" cx="60" cy="60" r="52"></circle><circle class="sg-ring-fg" id="sg-ring-fg" cx="60" cy="60" r="52"></circle></svg>
+                    <div class="sg-ring-txt"><div class="sg-streak" id="sg-streak">0</div><div class="sg-streak-l">يوم متتالي</div></div>
+                </div>
+                <div class="sg-hero-side">
+                    <h2 style="margin:0 0 6px;color:var(--text-main);font-size:1.15rem">🚫 تحدي السكر والغازيات</h2>
+                    <p id="sg-msg" style="color:var(--text-muted);font-size:.9rem;margin:0"></p>
+                    <button class="sg-today" id="sg-today-btn" onclick="toggleSugarDay(getLocalDateStr())"></button>
+                </div>
+            </div>
+            <div class="sg-stats">
+                <div class="sg-tile"><b id="sg-total">0</b><span>🌿 أيام نظيفة</span></div>
+                <div class="sg-tile"><b id="sg-best">0</b><span>🏆 أطول سلسلة</span></div>
+                <div class="sg-tile"><b id="sg-rate">0%</b><span>📈 نسبة الالتزام</span></div>
+                <div class="sg-tile"><b id="sg-days">1</b><span>📆 يوم في رحلتك</span></div>
+            </div>
+            <div class="sg-next"><div id="sg-next-txt"></div><div class="progress-bar-container" style="margin:8px 0 0"><div class="progress-bar-fill" id="sg-next-bar"></div></div></div>
+            <h3 class="sg-h">🏅 الأوسمة</h3>
+            <div class="sg-badges" id="sg-badges"></div>
+            <h3 class="sg-h">📅 التقويم (اضغط على أي يوم لتعليمه)</h3>
+            <div class="sg-cal-head"><button onclick="sgMonth(-1)">›</button><strong id="sg-month-label"></strong><button onclick="sgMonth(1)">‹</button></div>
+            <div class="sg-cal" id="sg-cal"></div>
+            <div class="sg-legend"><span>🟩 يوم نظيف</span><span>🟥 يوم فائت</span><span>⬜ خارج التحدي</span></div>
+            <div class="sg-foot">
+                <label>📆 بداية التحدي:</label>
+                <input type="date" id="sugar-start-input" onchange="setSugarStart(this.value)">
+                <button class="calc-btn" style="background:#ef4444" onclick="resetSugarChallenge()">إعادة البدء من اليوم</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 4. متابعة الوزن اليومي والخطوات -->
+    <main id="weight-tracker" class="section-content">
+        <div class="card pdf-data-block">
+            <h2 style="color: var(--accent); margin-bottom: 10px;">⚖️ تسجيل الوزن اليومي وإحصائيات الشهر</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
+                سجّل وزنك صباحاً بعد الاستيقاظ ودخول الحمام وقبل الأكل (أو من خانة الوزن السريع في بطاقة مهام اليوم).
+            </p>
+
+            <div class="calc-input-group">
+                <input type="date" id="daily-date" style="width: 170px;">
+                <input type="number" step="0.1" id="daily-weight" placeholder="الوزن (مثلاً 86.0)" style="width: 170px;">
+                <button class="calc-btn" onclick="addDailyWeight()">تسجيل اليوم</button>
+            </div>
+
+            <div class="stats-grid" style="margin: 20px 0;">
+                <div class="stat-box">
+                    <div class="stat-val" id="stat-start">-</div>
+                    <div class="stat-label">وزن البداية</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="stat-current">-</div>
+                    <div class="stat-label">الوزن الأخير</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="stat-diff">-</div>
+                    <div class="stat-label">صافي النزول / التغير</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="stat-min">-</div>
+                    <div class="stat-label">أدنى وزن محقق</div>
+                </div>
+            </div>
+
+            <div id="goal-progress" class="calc-res" style="display:none;background:#0f1a2b;border-color:var(--accent);color:var(--text-main);font-weight:600"></div>
+            <h4 style="color: var(--text-muted); margin-bottom: 5px;">مخطط المسار البياني للوزن:</h4>
+            <div class="chart-container">
+                <canvas id="weightCanvas" style="width:100%; height:100%;"></canvas>
+                <img id="weightChartPrintImg" style="display:none;" alt="مخطط الوزن">
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>الوزن المسجل</th>
+                            <th class="action-col">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="daily-weight-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card pdf-data-block">
+            <h3 style="color: var(--primary); margin-bottom: 10px;">📏 حاسبة مؤشر كتلة الجسم (BMI)</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">تُستخدم أحدث قراءة وزن مسجّلة تلقائياً، أدخل طولك فقط:</p>
+
+            <div class="calc-input-group">
+                <input type="number" step="0.1" id="bmi-height" placeholder="الطول (سم) مثلاً 175" style="width: 190px;">
+                <button class="calc-btn" onclick="calcBMI()">احسب المؤشر</button>
+            </div>
+
+            <div class="calc-res" id="bmiResult"></div>
+        </div>
+
+        <div class="card pdf-data-block" id="steps-settings-card">
+            <h2 style="color: var(--accent); margin-bottom: 10px;">👣 تسجيل الخطوات اليومية وإحصائيات الشهر</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
+                سجّل عدد خطواتك كل يوم من ساعتك أو تطبيق الجوال. حدد هدفك اليومي وتابع سلسلة الأيام المتتالية.
+            </p>
+
+            <div class="calc-input-group">
+                <input type="number" step="1" id="steps-goal" placeholder="الهدف اليومي (مثلاً 8000)" style="width: 190px;" onchange="saveStepsGoal()">
+                <span id="steps-goal-saved" style="color: var(--text-muted); font-size: 0.85rem;"></span>
+            </div>
+
+            <div class="calc-input-group" style="margin-top: 10px;">
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin:0; background: rgba(255,255,255,0.04); border: 1px dashed var(--accent); border-radius: 10px; padding: 10px 14px;">
+                    ✅ تُسجَّل خطواتك هنا تلقائياً من خانة «🚶‍♂️ تحقيق هدف الخطوات» في بطاقة «مهامي ووجباتي لليوم» أعلاه، فور الضغط على «💾 حفظ اليوم في سجل الشهر». لا حاجة لإدخالها مرتين.
+                </p>
+            </div>
+
+            <div id="steps-goal-progress-wrap" style="margin-top: 16px; display:none;">
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:var(--text-muted); margin-bottom:6px;">
+                    <span>تقدّم اليوم نحو الهدف</span>
+                    <span id="steps-goal-progress-label">0%</span>
+                </div>
+                <div style="background:#0b1220; border:1px solid var(--border-color); border-radius:8px; height:16px; overflow:hidden;">
+                    <div id="steps-goal-progress-bar" style="height:100%; width:0%; background:var(--text-muted); transition: width 0.3s, background 0.3s;"></div>
+                </div>
+            </div>
+
+            <div class="stats-grid" style="margin: 20px 0;">
+                <div class="stat-box">
+                    <div class="stat-val" id="steps-stat-avg">-</div>
+                    <div class="stat-label">متوسط الخطوات اليومي</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="steps-stat-max">-</div>
+                    <div class="stat-label">أعلى يوم</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="steps-stat-total">-</div>
+                    <div class="stat-label">إجمالي الخطوات</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="steps-stat-streak">-</div>
+                    <div class="stat-label">سلسلة تحقيق الهدف</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="steps-stat-calories">-</div>
+                    <div class="stat-label">سعرات تقريبية محروقة</div>
+                </div>
+            </div>
+
+            <h4 style="color: var(--text-muted); margin-bottom: 5px;">مخطط الخطوات اليومية:</h4>
+            <div class="chart-container">
+                <canvas id="stepsCanvas" style="width:100%; height:100%;"></canvas>
+                <img id="stepsChartPrintImg" style="display:none;" alt="مخطط الخطوات">
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>عدد الخطوات</th>
+                            <th>الهدف محقق؟</th>
+                            <th class="action-col">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="daily-steps-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card pdf-data-block">
+            <h3 style="color: var(--primary); margin-bottom: 10px;">📊 متوسط وزن الأسبوع (تلقائي)</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">
+                يُحسب تلقائياً من أوزانك المسجّلة في «تسجيل الوزن اليومي» أعلاه — كل أسبوع من السبت إلى الجمعة، بدون أي إدخال إضافي.
+            </p>
+
+            <div id="weeklyAvgList" style="margin-top: 15px;"></div>
+        </div>
+    </main>
+
+    <!-- 5. خيارات الوجبات الإرشادية -->
+    <main id="diet" class="section-content">
+        <div class="card">
+            <h2 style="color: var(--primary); margin-bottom: 8px;">أفكار وخيارات غذائية مقترحة للاستئناس</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">يمكنك استلهام وجباتك اليومية من هذه القوائم أو كتابة ما يناسبك في بطاقة الإنجاز:</p>
+
+            <div class="meal-card" style="border-top-color:var(--accent);margin-bottom:10px"><h4>📊 تقدير تقريبي للقيم (للاستئناس)</h4><ul class="meal-items">
+                <li>الفطور ≈ 475–530 سعرة و30–36 جم بروتين</li>
+                <li>الغداء ≈ 630–675 سعرة و60–72 جم بروتين</li>
+                <li>العشاء ≈ 400–500 سعرة و33–58 جم بروتين</li>
+                <li>مجموع الوجبات الثلاث ≈ 1,500–1,700 سعرة و125–165 جم بروتين، فأضف سناك بروتين أو كبّر الحصص حسب احتياجك.</li>
+                <li>مع الصيام 16/8 (وجبتان) اختر أكبر الخيارات وضع السناك داخل نافذة الأكل.</li>
+                <li>مثال يوم: فطور 1 + غداء 1 + عشاء 2 + زبادي يوناني بالمكسرات ≈ 1,850 سعرة و170 جم بروتين (زِد الحصص أو أضف سناكاً ثانياً حسب احتياجك).</li></ul></div>
+            <h3 style="color: var(--accent); margin: 15px 0 10px;">💪 أفكار سناك بروتين</h3>
+            <div class="diet-grid">
+                <div class="meal-card"><h4>شيك بروتين <span>🥤</span></h4><ul class="meal-items"><li>مغرفة واي + 250 مل حليب قليل الدسم + موزة</li><li>≈ 345 سعرة، 34 جم بروتين</li></ul></div>
+                <div class="meal-card"><h4>زبادي ومكسرات <span>🥣</span></h4><ul class="meal-items"><li>200 جم زبادي يوناني + 20 جم مكسرات</li><li>≈ 280 سعرة، 22 جم بروتين</li></ul></div>
+                <div class="meal-card"><h4>بيض وفاكهة <span>🥚</span></h4><ul class="meal-items"><li>2 بيض مسلوق + ثمرة فاكهة</li><li>≈ 220 سعرة، 12 جم بروتين</li></ul></div>
+                <div class="meal-card"><h4>ساندويتش تونة <span>🐟</span></h4><ul class="meal-items"><li>تونة مصفاة في توست بر صغير</li><li>≈ 250 سعرة، 25 جم بروتين</li></ul></div>
+            </div>
+            <h3 style="color: var(--accent); margin: 25px 0 10px;">🍳 أفكار لوجبة الفطور</h3>
+            <div class="diet-grid">
+                <div class="meal-card">
+                    <h4>الخيار 1 <span>🥚</span></h4>
+                    <ul class="meal-items">
+                        <li>3 بيضات كاملة مطبوخة باعتدال</li>
+                        <li>2 شريحة توست بر</li>
+                        <li>100 جم فول مدمس ببهارات وليمون</li>
+                        <li>طبق خضار طازجة (خيار/طماطم)</li>
+                    </ul>
+                </div>
+
+                <div class="meal-card">
+                    <h4>الخيار 2 <span>🍳</span></h4>
+                    <ul class="meal-items">
+                        <li>2 بيضة + 150 جم بياض بيض</li>
+                        <li>2 شريحة توست بر</li>
+                        <li>خضار مشكلة</li>
+                        <li>ثمرة فاكهة طازجة (تفاح/برتقال)</li>
+                    </ul>
+                </div>
+
+                <div class="meal-card">
+                    <h4>الخيار 3 <span>🥣</span></h4>
+                    <ul class="meal-items">
+                        <li>200 جم زبادي يوناني / عالي البروتين</li>
+                        <li>50 جم شوفان كامل الحبة</li>
+                        <li>حبة موزة مقطعة</li>
+                        <li>10 جم مكسرات نيّة (لوز/جوز)</li>
+                    </ul>
+                </div>
+
+                <div class="meal-card">
+                    <h4>الخيار 4 <span>🫘</span></h4>
+                    <ul class="meal-items">
+                        <li>200 جم فول بزيت خفيف وكمون</li>
+                        <li>1 خبز عربي بر صغير</li>
+                        <li>2 بيض مسلوق</li>
+                        <li>طبق خضار ورقية</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 style="color: var(--accent); margin: 30px 0 10px;">🍗 أفكار لوجبة الغداء</h3>
+            <div class="diet-grid">
+                <div class="meal-card">
+                    <h4>1. دجاج + رز <span>🍚</span></h4>
+                    <ul class="meal-items">
+                        <li>200 جم دجاج مطبوخ (صدر أو بدون جلد)</li>
+                        <li>150–180 جم رز مطبوخ</li>
+                        <li>سلطة خضراء مشكلة كبيرة</li>
+                        <li>كوب زبادي قليل الدسم</li>
+                    </ul>
+                </div>
+
+                <div class="meal-card">
+                    <h4>2. كبسة دجاج منزلية <span>🥘</span></h4>
+                    <ul class="meal-items">
+                        <li>200 جم دجاج محمر باعتدال</li>
+                        <li>حوالي 150 جم رز كبسة مطبوخ</li>
+                        <li>سلطة خضراء طازجة</li>
+                        <li>بدون إضافة زيوت مبالغ فيها</li>
+                    </ul>
+                </div>
+
+                <div class="meal-card">
+                    <h4>3. مكرونة بالدجاج <span>🍝</span></h4>
+                    <ul class="meal-items">
+                        <li>180–200 جم دجاج مقطع ومتبل</li>
+                        <li>150–180 جم مكرونة مسلوقة</li>
+                        <li>صلصة طماطم طبيعية وأعشاب</li>
+                        <li>طبق سلطة ورقية</li>
+                    </ul>
+                </div>
+
+                <div class="meal-card">
+                    <h4>4. بطاطس + دجاج <span>🥔</span></h4>
+                    <ul class="meal-items">
+                        <li>200 جم دجاج مشوي</li>
+                        <li>250 جم بطاطس مسلوقة أو مشوية</li>
+                        <li>طبق سلطة خضار طازجة</li>
+                        <li>كوب زبادي قليل الدسم</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 style="color: var(--accent); margin: 30px 0 10px;">🌯 أفكار لوجبة العشاء</h3>
+            <div class="diet-grid">
+                <div class="meal-card">
+                    <h4>شاورما منزلية <span>🌯</span></h4>
+                    <ul class="meal-items">
+                        <li>180 جم دجاج متبل مشوي بالمقلاة</li>
+                        <li>خبز عربي صغير بر</li>
+                        <li>خضار ومخلل خفيف</li>
+                        <li>صوص زبادي وثوم خفيف</li>
+                    </ul>
+                </div>
+
+                <div class="meal-card">
+                    <h4>تونة <span>🐟</span></h4>
+                    <ul class="meal-items">
+                        <li>علبة تونة مصفاة من الزيت مع ليمون</li>
+                        <li>2 شريحة توست بر</li>
+                        <li>خضار مشكلة (خس/خيار)</li>
+                        <li>كوب زبادي خفيف</li>
+                    </ul>
+                </div>
+
+                <div class="meal-card">
+                    <h4>بيض <span>🍳</span></h4>
+                    <ul class="meal-items">
+                        <li>3 بيضات مطبوخة حسب الرغبة</li>
+                        <li>2 شريحة توست بر</li>
+                        <li>خضار طازجة</li>
+                        <li>كوب زبادي</li>
+                    </ul>
+                </div>
+
+                <div class="meal-card">
+                    <h4>ساندويتش دجاج <span>🥪</span></h4>
+                    <ul class="meal-items">
+                        <li>150–180 جم دجاج مشوي</li>
+                        <li>2 شريحة توست بر</li>
+                        <li>خس وطماطم</li>
+                        <li>صوص مايونيز خفيف أو زبادي</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 6. مراحل التطور خلال 4 أسابيع -->
+    <main id="plan" class="section-content">
+        <div class="card">
+            <h2 style="color: var(--amber); margin-bottom: 12px;">📈 خريطة التطور خلال الشهر (4 أسابيع)</h2>
+            <div class="weeks-flow">
+                <div class="week-box">
+                    <h3>الأسبوع 1: التأسيس والتخلص من السكر</h3>
+                    <p>التزم بتسجيل وجباتك وتفادي السكريات والغازيات والحرص على شرب الماء والخطوات.</p>
+                </div>
+                <div class="week-box">
+                    <h3>الأسبوع 2: استقرار الطاقة</h3>
+                    <p>ستشعر بخفة ونشاط أعلى بعد توديع السكر الأبيض. حافظ على تسجيل وزنك يومياً لحساب المتوسط.</p>
+                </div>
+                <div class="week-box">
+                    <h3>الأسبوع 3: تعزيز حرق الدهون</h3>
+                    <p>مرحلة انضباط قوية؛ راقب مقاسات ملابسك وشكل جسمك واستمر في توثيق وجباتك والتزامك.</p>
+                </div>
+                <div class="week-box">
+                    <h3>الأسبوع 4: حصد النتائج</h3>
+                    <p>إتمام الشهر بنجاح (وتحدي السكر مستمر معك)، وقياس الفرق الصافي في الوزن والوصول إلى أهدافك.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <div>تصميم وتطوير: <strong>عبدالرحمن السيد</strong></div>
+        <div style="margin-top:6px;">
+            للدعم الفني والتواصل:
+            <a href="tel:0548404721">📞 0548404721</a> |
+            <a href="https://wa.me/966548404721" target="_blank" rel="noopener">💬 واتساب مباشر</a>
+        </div>
+    </footer>
+</div>
+
+<script>
+    function updateMealsNote(){const n=['chk_breakfast','chk_lunch','chk_dinner'].filter(i=>document.getElementById(i)?.checked).length,el=document.getElementById('meals_note');if(!el)return;
+        el.style.display=n?'block':'none';
+        el.innerText=n===1?'🍽️ وجبة واحدة، أكمل وجبتين على الأقل لتكتمل الوجبات.':n===2?'⏱️ وجبتان (نظام 16/8): الوجبات محتسبة كاملة ✅':'🍽️ ثلاث وجبات: الوجبات محتسبة كاملة ✅';}
+    function toast(m){const t=document.getElementById('toast');if(!t)return;t.innerText=m;t.style.display='block';clearTimeout(window._tt);window._tt=setTimeout(()=>{t.style.display='none'},3200);}
+    function refreshDynamicTexts(){let g=null;try{g=JSON.parse(localStorage.getItem('monthly_weight_goal_range'))}catch(e){}
+        const f=g&&g.from!=null?g.from:86,t=g&&g.to!=null?g.to:80;
+        const set=(c,v)=>document.querySelectorAll(c).forEach(e=>{e.innerText=v});
+        set('.dyn-from',f);set('.dyn-to',t);set('.dyn-steps',getTargetSteps().toLocaleString('en-US'));}
+    function updateDayCounter(){const el=document.getElementById('day-counter');if(!el)return;const n=sugarIndexOf(getLocalDateStr());el.innerText=n<1?'':(`📆 اليوم ${n} من رحلتك · `);}
+    function waterGoalL(){try{const v=JSON.parse(localStorage.getItem('header_stat_water'));if(v&&v.from>0)return v.from}catch(e){}return 2.5}
+    function getWater(){return parseInt(document.getElementById('input_water_glasses').value)||0}
+    function setWater(n){n=Math.max(0,n);document.getElementById('input_water_glasses').value=n;document.getElementById('water_glasses_txt').innerText=n;document.getElementById('water_hint').innerText=`(${(n*0.25).toFixed(2)} من ${waterGoalL()} لتر)`;}
+    function changeWater(d){const n=Math.max(0,getWater()+d);setWater(n);const cb=document.getElementById('chk_water'),ok=n*0.25>=waterGoalL();if(cb.checked!==ok){cb.checked=ok;cb.closest('.check-item').classList.toggle('done',ok);}autoSaveCurrentInputs();updateDailyProgress();}
+    function updateNutritionHints(){document.getElementById('protein_hint').innerText='(اختياري)';setWater(getWater());}
+        function onNutritionChanged(){updateNutritionHints();autoSaveCurrentInputs();}
+    function loadNutrition(entry,ds){const d=(JSON.parse(localStorage.getItem('daily_fitness_tasks'))||{})[ds]||{};
+        const x=entry?{p:entry.protein,k:entry.kcal,w:entry.water}:{p:d.protein,k:d.kcal,w:d.water};
+        document.getElementById('input_protein').value=x.p||'';document.getElementById('input_kcal').value=x.k||'';setWater(x.w||0);updateNutritionHints();}
+    function renderGoalProgress(){const el=document.getElementById('goal-progress');if(!el)return;
+        let g=null;try{g=JSON.parse(localStorage.getItem('monthly_weight_goal_range'))}catch(e){}
+        const from=g?g.from:86,to=g?g.to:80,w=getDailyWeights();
+        if(!w.length){el.style.display='none';return;}
+        el.style.display='block';const cur=w[w.length-1].weight,tot=from-to;
+        const pct=tot>0?Math.max(0,Math.min(100,Math.round((from-cur)/tot*100))):0;
+        const left=Math.max(0,cur-to),dn=new Date(),days=new Date(dn.getFullYear(),dn.getMonth()+1,0).getDate()-dn.getDate()+1;
+        let note='';if(left>0&&days>0){const wk=left/(days/7);note=` — المعدل المطلوب ${wk.toFixed(1)} كجم/أسبوع`+(wk>1?' (أعلى من المعدل الشائع 0.5–1 كجم/أسبوع، فكّر في مرونة الهدف)':'');}
+        el.innerHTML=`🎯 تقدمك نحو الهدف: <strong>${pct}%</strong> — المتبقي ${left.toFixed(1)} كجم خلال ${days} يوم${note}`;}
+
+    function getLocalDateStr(d) {
+        d = d || new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    const TAB_ORDER = ['month-log', 'workout-schedule', 'sugar-challenge', 'weight-tracker', 'diet', 'plan'];
+
+    function moveTabIndicator() {
+        const b = document.querySelector('.tab-btn.active'), ind = document.getElementById('tab-ind');
+        if (!b || !ind) return;
+        ind.style.width = b.offsetWidth + 'px';
+        ind.style.left = b.offsetLeft + 'px';
+        b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    }
+
+    function switchTab(tabId) {
+        const cur = document.querySelector('.section-content.active');
+        const target = document.getElementById(tabId);
+        if (!target) return;
+        if (cur === target) { moveTabIndicator(); return; }
+        const dir = TAB_ORDER.indexOf(tabId) > (cur ? TAB_ORDER.indexOf(cur.id) : -1) ? 'from-left' : 'from-right';
+        document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active', 'from-left', 'from-right'));
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            const on = b.dataset.tab === tabId;
+            b.classList.toggle('active', on);
+            b.setAttribute('aria-selected', on);
+        });
+        target.classList.add('active', dir);
+        moveTabIndicator();
+
+        if (tabId === 'weight-tracker') {
+            setTimeout(() => {
+                drawWeightChart(getDailyWeights());
+                drawStepsChart(getDailySteps(), getStepsGoal());
+            }, 50);
+        }
+    }
+
+    /* تمييز بطاقة تمرين اليوم تلقائياً وربطها ببطاقة المهام */
+    function highlightTodayWorkoutCard() {
+        const dateStr = document.getElementById('checklist-date')?.value || getLocalDateStr();
+        const d = new Date(dateStr + 'T00:00:00');
+        const dayIdx = d.getDay(); // 0=الأحد ... 6=السبت
+
+        document.querySelectorAll('.workout-day-card').forEach(card => {
+            const isT = parseInt(card.getAttribute('data-day'), 10) === dayIdx;
+            card.classList.toggle('today-highlight', isT);
+            card.querySelectorAll('.workout-meta button').forEach(b => { b.disabled = !isT; });
+        });
+    }
+
+    function markTodayWorkoutDone(isRestDay) {
+        if (isRestDay) {
+            const restCb = document.getElementById('chk_restday');
+            if (restCb) {
+                restCb.checked = true;
+                toggleRestDay();
+            }
+        } else {
+            const restCb = document.getElementById('chk_restday');
+            if (restCb && restCb.checked) {
+                restCb.checked = false;
+                applyRestDayVisual(false);
+            }
+            const workoutCb = document.getElementById('chk_workout');
+            if (workoutCb) {
+                workoutCb.checked = true;
+                toggleCheckItem('chk_workout');
+            }
+        }
+
+        const tasksCard = document.getElementById('daily-tasks-card');
+        if (tasksCard) {
+            tasksCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    const motivationalQuotes = [
+        "الالتزام هو أن تفعل ما يجب عليك فعله، حتى وإن لم تكن ترغب في ذلك.",
+        "الجسم الذي تحلم به يُبنى بالاختيارات الصغيرة والخطوات اليومية المستمرة.",
+        "ألم الانضباط اليومي أخف بكثير من ألم الندم والتراجع لاحقاً.",
+        "لا تبحث عن الحماس المؤقت، بل اصنع العادة والاستمرارية.",
+        "الانتصار الحقيقي ليس في نهاية التحدي فقط، بل في إنهاء مهام وخطوات اليوم بنجاح.",
+        "كل وجبة صحية ومحسوبة وخطواتك اليومية تقربك أكثر من هدفك.",
+        "تحدي النفس هو أصعب معركة، والانتصار فيها هو أعظم إنجاز ستفتخر به."
+    ];
+
+    function newQuote() {
+        const textEl = document.getElementById('quote-text');
+        const currentText = textEl.innerText.replace(/"/g, '');
+        let available = motivationalQuotes.filter(q => q !== currentText);
+        const randomQuote = available[Math.floor(Math.random() * available.length)];
+        textEl.innerText = `"${randomQuote}"`;
+    }
+
+    const SYNC_KEYS = [
+        'sugar_challenge_start',
+        'daily_fitness_tasks',
+        'monthly_fitness_tasks_log',
+        'sugar_challenge_month_days',
+        'sugar_challenge_target_days',
+        'daily_weights_month',
+        'fitnessPlanWeeklyWeightHistory',
+        'fitness_height_cm',
+        'daily_steps_month',
+        'daily_steps_goal',
+        'monthly_weight_goal_range',
+        'header_stat_water'
+    ];
+
+    function rpChart(pts, o) {
+        if (!pts.length) return null;
+        const W = 740, H = 210, dpr = 2, c = document.createElement('canvas');
+        c.width = W * dpr; c.height = H * dpr;
+        const g = c.getContext('2d');
+        g.scale(dpr, dpr);
+        g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+        const L = 52, R = 14, T = 14, B = 30;
+        let ys = pts.map(p => p.y);
+        if (o.goal != null) ys = ys.concat(o.goal);
+        let mn = Math.min(...ys), mx = Math.max(...ys);
+        const pad = (mx - mn || 1) * 0.12;
+        mn = o.zero ? 0 : mn - pad; mx += pad;
+        const X = i => L + (pts.length === 1 ? (W - L - R) / 2 : i * (W - L - R) / (pts.length - 1));
+        const Y = v => T + (H - T - B) * (1 - (v - mn) / (mx - mn));
+        g.font = '11px sans-serif'; g.strokeStyle = '#e5e7eb'; g.fillStyle = '#6b7280'; g.textAlign = 'right';
+        for (let k = 0; k <= 4; k++) {
+            const v = mn + (mx - mn) * k / 4, y = Y(v);
+            g.beginPath(); g.moveTo(L, y); g.lineTo(W - R, y); g.stroke();
+            g.fillText(o.fmt(v), L - 6, y + 4);
+        }
+        g.textAlign = 'center';
+        const step = Math.ceil(pts.length / 8);
+        pts.forEach((p, i) => { if (i % step === 0 || i === pts.length - 1) g.fillText(p.x, X(i), H - 10); });
+        if (o.bars) {
+            const bw = Math.max(3, Math.min(26, (W - L - R) / pts.length * 0.7));
+            pts.forEach((p, i) => { g.fillStyle = (o.goal != null && p.y >= o.goal) ? '#16a34a' : '#60a5fa'; g.fillRect(X(i) - bw / 2, Y(p.y), bw, Y(mn) - Y(p.y)); });
+        } else {
+            g.strokeStyle = '#2563eb'; g.lineWidth = 2; g.beginPath();
+            pts.forEach((p, i) => i ? g.lineTo(X(i), Y(p.y)) : g.moveTo(X(i), Y(p.y)));
+            g.stroke(); g.fillStyle = '#2563eb';
+            pts.forEach((p, i) => { g.beginPath(); g.arc(X(i), Y(p.y), 3, 0, 7); g.fill(); });
+        }
+        if (o.goal != null) {
+            g.setLineDash([6, 4]); g.strokeStyle = '#16a34a'; g.lineWidth = 1.5;
+            g.beginPath(); g.moveTo(L, Y(o.goal)); g.lineTo(W - R, Y(o.goal)); g.stroke(); g.setLineDash([]);
+            g.fillStyle = '#16a34a'; g.textAlign = 'left'; g.fillText(o.goalLbl, L + 4, Y(o.goal) - 5);
+        }
+        return c.toDataURL('image/png');
+    }
+
+    async function generatePDFDirect() {
+        const statusEl = document.getElementById('pdf-status');
+        const btns = document.querySelectorAll('.calc-btn');
+        if (typeof html2canvas === 'undefined' || !window.jspdf) {
+            statusEl.style.color = '#f87171';
+            statusEl.innerText = '❌ تعذّر تحميل أدوات إنشاء PDF (يحتاج اتصال إنترنت). جرّب «طباعة عادية» بدلاً من ذلك.';
+            return;
+        }
+        statusEl.style.color = 'var(--accent)';
+        statusEl.innerText = '⏳ جاري تجهيز التقرير...';
+        btns.forEach(b => b.disabled = true);
+        const host = document.createElement('div');
+        try {
+            const mf = selectedLogMonth !== 'all' ? selectedLogMonth : null;
+            const inM = r => !mf || r.date.slice(0, 7) === mf;
+            const by = (a, b) => a.date < b.date ? -1 : 1;
+            const log = (JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || []).filter(inM).sort(by);
+            const wts = getDailyWeights().filter(inM).sort(by);
+            const stp = getDailySteps().filter(inM).sort(by);
+            const goal = JSON.parse(localStorage.getItem('monthly_weight_goal_range') || 'null') || { from: 86, to: 80 };
+            const sg = getStepsGoal() || getTargetSteps(), ss = sugarStats();
+            const avg = a => a.length ? Math.round(a.reduce((x, y) => x + y, 0) / a.length) : 0;
+            const wLast = wts[wts.length - 1];
+            const chg = wts.length ? wLast.weight - wts[0].weight : null;
+            const tiles = [
+                ['الوزن الحالي', wLast ? wLast.weight + ' كجم' : '-'],
+                ['التغير الصافي', chg === null ? '-' : (chg > 0 ? '+' : '') + chg.toFixed(1) + ' كجم'],
+                ['الهدف', goal.from + ' ← ' + goal.to + ' كجم'],
+                ['متوسط الإنجاز اليومي', avg(log.map(e => e.pct)) + '%'],
+                ['أيام مكتملة 100%', log.filter(e => e.pct >= 100).length + ' / ' + log.length],
+                ['متوسط الخطوات', avg(stp.map(r => r.steps)).toLocaleString('en-US')],
+                ['سلسلة السكر الحالية', ss.cur + ' يوم'],
+                ['أيام نظيفة من السكر', ss.done + ' (' + ss.rate + '%)']
+            ];
+            const tileHtml = a => a.map(t => `<div class="rp-k"><small>${t[0]}</small><b>${t[1]}</b></div>`).join('');
+            const css = `<style>.rp{width:794px;background:#fff;color:#111827;direction:rtl}.rp-c{padding:14px 28px;background:#fff}.rp h1{margin:0 0 4px;font-size:26px;color:#1d4ed8}.rp h2{margin:0 0 10px;font-size:17px;color:#1d4ed8;border-right:5px solid #2563eb;padding-right:10px}.rp small{color:#6b7280}.rp-t{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.rp-k{border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;background:#f9fafb}.rp-k b{display:block;font-size:16px;margin-top:4px}.rp table{width:100%;border-collapse:collapse;font-size:12px}.rp th{background:#1d4ed8;color:#fff;padding:7px;text-align:right}.rp td{padding:6px 7px;border-bottom:1px solid #e5e7eb;vertical-align:top}.rp-g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:12px}.rp-g div{border:1px solid #e5e7eb;border-radius:6px;padding:5px 8px;background:#f9fafb}.rp-h{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;margin:10px 0 6px}.rp-h i{height:18px;border-radius:4px}</style>`;
+            const ch = [];
+            ch.push(`<h1>🏋️ تقرير المتابعة الشهرية</h1><small>${mf ? 'شهر ' + mf : 'كل الفترة'} • صدر في ${getLocalDateStr()}</small><div class="rp-t" style="margin-top:14px">${tileHtml(tiles)}</div>`);
+            const wImg = rpChart(wts.map(r => ({ x: r.date.slice(5), y: r.weight })), { goal: goal.to, goalLbl: 'الهدف ' + goal.to, fmt: v => v.toFixed(1) });
+            if (wImg) ch.push(`<h2>⚖️ مسار الوزن</h2><img src="${wImg}" style="width:100%">`);
+            const sImg = rpChart(stp.map(r => ({ x: r.date.slice(5), y: r.steps })), { goal: sg, goalLbl: 'الهدف ' + sg, fmt: v => Math.round(v).toLocaleString('en-US'), bars: true, zero: true });
+            if (sImg) ch.push(`<h2>🚶 الخطوات اليومية</h2><img src="${sImg}" style="width:100%">`);
+            const cells = Array.from({ length: 42 }, (_, i) => {
+                const d = addDaysStr(ss.today, i - 41);
+                const col = sugarDays[d] ? '#16a34a' : (d < ss.start || d > ss.today ? '#e5e7eb' : '#fca5a5');
+                return `<i style="background:${col}"></i>`;
+            }).join('');
+            ch.push(`<h2>🚫 تحدي السكر والغازيات</h2><div class="rp-t">${tileHtml([['السلسلة الحالية', ss.cur + ' يوم'], ['أطول سلسلة', ss.best + ' يوم'], ['أيام نظيفة', ss.done], ['نسبة الالتزام', ss.rate + '%']])}</div><div class="rp-h">${cells}</div><small>آخر 6 أسابيع: أخضر = يوم نظيف، أحمر = يوم فائت، رمادي = خارج التحدي</small>`);
+            for (let i = 0; i < wts.length; i += 36) {
+                const part = wts.slice(i, i + 36).map((r, j) => {
+                    const p = wts[i + j - 1], d = p ? r.weight - p.weight : 0;
+                    return `<div>${r.date.slice(5)} — <b>${r.weight}</b> كجم ${p ? `<small>(${d > 0 ? '+' : ''}${d.toFixed(1)})</small>` : ''}</div>`;
+                }).join('');
+                ch.push(`<h2>📋 سجل الأوزان${i ? ' (تابع)' : ''}</h2><div class="rp-g">${part}</div>`);
+            }
+            const th = '<tr><th>التاريخ</th><th>الإنجاز</th><th>المهام</th><th>الخطوات</th><th>الوزن</th><th>الوجبات</th></tr>';
+            const row = e => {
+                const tasks = (e.tasks || []).filter(t => typeof t === 'string').join(' • ');
+                const m = e.meals || {};
+                const meals = [m.breakfast && 'ف: ' + m.breakfast, m.lunch && 'غ: ' + m.lunch, m.dinner && 'ع: ' + m.dinner].filter(Boolean).map(escapeHtml).join('<br>');
+                const col = e.pct >= 100 ? '#16a34a' : e.pct >= 60 ? '#d97706' : '#dc2626';
+                return `<tr><td>${e.date}</td><td style="color:${col};font-weight:700">${e.pct}%</td><td>${escapeHtml(tasks)}</td><td>${e.steps ? e.steps.toLocaleString('en-US') : '-'}</td><td>${e.weight || '-'}</td><td>${meals || '-'}</td></tr>`;
+            };
+            for (let i = 0; i < log.length; i += 8) ch.push(`<h2>🗓️ السجل اليومي${i ? ' (تابع)' : ''}</h2><table>${th}${log.slice(i, i + 8).map(row).join('')}</table>`);
+            if (!log.length) ch.push('<h2>🗓️ السجل اليومي</h2><small>لا توجد أيام محفوظة.</small>');
+
+            host.className = 'rp';
+            host.style.cssText = 'position:fixed;left:0;top:0;z-index:-9999';
+            host.innerHTML = css + ch.map(c => `<div class="rp-c">${c}</div>`).join('');
+            document.body.appendChild(host);
+            await Promise.all([...host.querySelectorAll('img')].map(im => im.decode ? im.decode().catch(() => { }) : 0));
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+            const pageW = 595.28, pageH = 841.89, m = 24, cw = pageW - 2 * m, maxH = pageH - 2 * m - 12;
+            let y = m;
+            for (const el of host.querySelectorAll('.rp-c')) {
+                const shot = await html2canvas(el, { backgroundColor: '#ffffff', scale: 1.6, useCORS: true });
+                let w = cw, h = shot.height * (cw / shot.width);
+                if (h > maxH) { w = w * maxH / h; h = maxH; }
+                if (y + h > pageH - m - 12 && y > m) { pdf.addPage(); y = m; }
+                pdf.addImage(shot.toDataURL('image/jpeg', 0.92), 'JPEG', m, y, w, h);
+                y += h + 6;
+            }
+            const n = pdf.getNumberOfPages();
+            for (let i = 1; i <= n; i++) { pdf.setPage(i); pdf.setFontSize(8); pdf.setTextColor(150); pdf.text(`${i} / ${n}`, pageW / 2, pageH - 12, { align: 'center' }); }
+            pdf.save(`fitness_report_${getLocalDateStr()}.pdf`);
+            statusEl.style.color = 'var(--success)';
+            statusEl.innerText = '✅ تم استخراج التقرير بنجاح!';
+        } catch (err) {
+            statusEl.style.color = '#f87171';
+            statusEl.innerText = '❌ حدث خطأ أثناء إنشاء التقرير: ' + err.message;
+        } finally {
+            host.remove();
+            btns.forEach(b => b.disabled = false);
+        }
+    }
+
+    function printReport() {
+        drawWeightChart(getDailyWeights(), true);
+        drawStepsChart(getDailySteps(), getStepsGoal());
+
+        const canvas = document.getElementById('weightCanvas');
+        const img = document.getElementById('weightChartPrintImg');
+        if (canvas && img) {
+            try { img.src = canvas.toDataURL('image/png'); } catch (e) { }
+        }
+
+        const stepsCanvas = document.getElementById('stepsCanvas');
+        const stepsImg = document.getElementById('stepsChartPrintImg');
+        if (stepsCanvas && stepsImg) {
+            try { stepsImg.src = stepsCanvas.toDataURL('image/png'); } catch (e) { }
+        }
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            alert('📄 راح تفتح شاشة معاينة الطباعة. لحفظه كملف PDF: اضغط على أيقونة "مشاركة" (المربع والسهم) في الأعلى، ثم اختر "حفظ في ملفات".');
+        }
+
+        window.print();
+        setTimeout(() => drawWeightChart(getDailyWeights(), false), 500);
+    }
+
+    function exportFitnessData() {
+        localStorage.setItem(SUGAR_KEY, JSON.stringify(sugarDays));
+        const dataObj = {};
+        SYNC_KEYS.forEach(k => {
+            dataObj[k] = localStorage.getItem(k);
+        });
+        const ssx = sugarStats();
+        dataObj.sugar_summary = { start: ssx.start, cleanDays: Object.keys(sugarDays).sort(), currentStreak: ssx.cur, bestStreak: ssx.best, totalClean: ssx.done };
+        dataObj.exported_at = new Date().toISOString();
+
+        const jsonStr = JSON.stringify(dataObj, null, 2);
+
+        try {
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            const todayStr = getLocalDateStr();
+            a.download = `fitness_backup_${todayStr}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } catch (err) {
+            const w = window.open('', '_blank');
+            if (w) {
+                w.document.write(`<pre style="white-space:pre-wrap; direction:ltr; text-align:left; font-family:monospace;">${jsonStr.replace(/</g, '&lt;')}</pre>`);
+                toast('تعذّر التحميل التلقائي، تم فتح نافذة فيها بياناتك لنسخها.');
+            } else {
+                toast('تعذّر تصدير الملف.');
+            }
+        }
+
+        localStorage.setItem('last_backup_time', Date.now().toString());
+        updateBackupStatus();
+    }
+
+    function updateBackupStatus() {
+        const el = document.getElementById('backup-status');
+        if (!el) return;
+        const last = parseInt(localStorage.getItem('last_backup_time'), 10);
+
+        if (!last) {
+            el.textContent = '⚠️ لم يتم إنشاء نسخة احتياطية بعد — يُفضّل التصدير أسبوعياً';
+            el.className = 'backup-status warn';
+            return;
+        }
+
+        const days = Math.floor((Date.now() - last) / 86400000);
+        if (days <= 0) {
+            el.textContent = '✅ آخر نسخة احتياطية: اليوم';
+            el.className = 'backup-status ok';
+        } else if (days <= 7) {
+            el.textContent = `✅ آخر نسخة احتياطية: منذ ${days} يوم`;
+            el.className = 'backup-status ok';
+        } else {
+            el.textContent = `⚠️ آخر نسخة احتياطية منذ ${days} يوماً — حان وقت التصدير`;
+            el.className = 'backup-status warn';
+        }
+    }
+
+    function importFitnessData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (!parsed || typeof parsed !== 'object') throw new Error('bad');
+                if (!confirm('سيتم دمج بيانات الملف مع بياناتك الحالية (الأيام المتطابقة تُستبدل بما في الملف وبقية أيامك تبقى كما هي).\n\nهل تريد المتابعة؟')) return;
+                const pj = v => { try { return JSON.parse(v); } catch (_) { return null; } };
+                const hasDate = a => a.every(r => r && r.date);
+                SYNC_KEYS.forEach(k => {
+                    const inc = parsed[k];
+                    if (inc === undefined || inc === null) return;
+                    if (k === 'sugar_challenge_start' || k === 'sugar_challenge_month_days') return;
+                    const cur = pj(localStorage.getItem(k)), imp = pj(inc);
+                    if (Array.isArray(cur) && Array.isArray(imp) && hasDate(cur) && hasDate(imp)) {
+                        const m = {};
+                        cur.concat(imp).forEach(r => { m[r.date] = r; });
+                        localStorage.setItem(k, JSON.stringify(Object.values(m).sort((a, b) => a.date < b.date ? -1 : 1)));
+                    } else if (cur && imp && typeof cur === 'object' && typeof imp === 'object' && !Array.isArray(cur) && !Array.isArray(imp) && k !== 'monthly_weight_goal_range' && !k.startsWith('header_stat_')) {
+                        localStorage.setItem(k, JSON.stringify(Object.assign({}, cur, imp)));
+                    } else {
+                        localStorage.setItem(k, inc);
+                    }
+                });
+                const sd = Object.assign({}, pj(localStorage.getItem('sugar_challenge_month_days')) || {}, pj(parsed.sugar_challenge_month_days) || {});
+                ((parsed.sugar_summary && parsed.sugar_summary.cleanDays) || []).forEach(d => { sd[d] = true; });
+                localStorage.setItem('sugar_challenge_month_days', JSON.stringify(sd));
+                const sts = [localStorage.getItem('sugar_challenge_start'), parsed.sugar_challenge_start, parsed.sugar_summary && parsed.sugar_summary.start].filter(Boolean).sort();
+                if (sts.length) localStorage.setItem('sugar_challenge_start', sts[0]);
+                localStorage.setItem('last_backup_time', Date.now().toString());
+                toast('✅ تم دمج بياناتك بنجاح، جاري تحديث الصفحة...');
+                setTimeout(() => location.reload(), 1200);
+            } catch (err) {
+                toast('❌ حدث خطأ أثناء قراءة الملف، تأكد من اختيار ملف النسخة الصحيح.');
+            } finally {
+                event.target.value = '';
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function updateReminderBanner() {
+        const banner = document.getElementById('reminder-banner');
+        const list = document.getElementById('reminder-list');
+        if (!banner || !list) return;
+
+        const todayStr = getLocalDateStr();
+        const messages = [];
+
+        const monthlyLog = JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || [];
+        const loggedToday = monthlyLog.some(e => e.date === todayStr);
+        if (!loggedToday && new Date().getHours() >= 20) messages.push('📋 لم تحفظ مهام ووجبات اليوم في سجل الشهر بعد.');
+
+        const weights = JSON.parse(localStorage.getItem('daily_weights_month')) || [];
+        const weightToday = weights.some(w => w.date === todayStr);
+        if (!weightToday) messages.push('⚖️ لم تسجل وزنك لهذا اليوم بعد.');
+
+        if (messages.length === 0) {
+            banner.classList.remove('show');
+            list.innerHTML = '';
+        } else {
+            banner.classList.add('show');
+            list.innerHTML = messages.join('<br>');
+        }
+    }
+
+    /* ----------------------------------------------------
+       1. مهام وسجل الإنجاز مع دعم الصيام المتقطع 16/8 والوزن السريع
+    ---------------------------------------------------- */
+    const CHECKLIST_KEY = 'daily_fitness_tasks';
+    const MONTHLY_LOG_KEY = 'monthly_fitness_tasks_log';
+    
+    const checkConfig = [
+        { id: 'chk_workout', name: 'تمرنت' },
+        { id: 'chk_breakfast', name: 'فطور' },
+        { id: 'chk_lunch', name: 'غداء' },
+        { id: 'chk_dinner', name: 'عشاء' },
+        { id: 'chk_water', name: 'ماء' },
+        { id: 'chk_sugar', name: 'بدون سكر' }
+    ];
+
+    function getTargetSteps() {
+        return getStepsGoal() || 5000;
+    }
+
+    function updateStepsLabelUI() {
+        const target = getTargetSteps();
+        const sub = document.getElementById('steps_sub_goal_txt');
+        if (sub) sub.innerText = `(الهدف: ${target.toLocaleString('en-US')})`;
+        const hGoal = document.getElementById('header-steps-goal');
+        if (hGoal) hGoal.innerText = `≥ ${target.toLocaleString('en-US')}`;
+        refreshDynamicTexts();
+    }
+
+    function goToStepsGoal() {
+        switchTab('weight-tracker');
+        setTimeout(() => {
+            const card = document.getElementById('steps-settings-card');
+            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const input = document.getElementById('steps-goal');
+            if (input) input.focus();
+        }, 100);
+    }
+
+    function isStepsTaskDone(stepsVal) {
+        const target = getTargetSteps();
+        return (stepsVal >= target);
+    }
+
+    function onStepsInputChanged() {
+        const val = parseInt(document.getElementById('input_steps_count').value) || 0;
+        const parent = document.getElementById('item_steps');
+        if (isStepsTaskDone(val)) {
+            parent.classList.add('done');
+        } else {
+            parent.classList.remove('done');
+        }
+        autoSaveCurrentInputs();
+        updateDailyProgress();
+    }
+
+    function onQuickWeightChanged() {
+        const val = parseFloat(document.getElementById('input_daily_weight_quick').value) || 0;
+        const parent = document.getElementById('item_weight_quick');
+        if (val > 0) {
+            parent.classList.add('done');
+        } else {
+            parent.classList.remove('done');
+        }
+        autoSaveCurrentInputs();
+    }
+
+    function toggleCheckItem(id) {
+        const cb = document.getElementById(id);
+        const parent = cb.closest('.check-item');
+        if (cb.checked) parent.classList.add('done');
+        else parent.classList.remove('done');
+
+        autoSaveCurrentInputs();
+        updateDailyProgress();
+    }
+
+    function isFastingChecked() {
+        return ['chk_breakfast', 'chk_lunch', 'chk_dinner'].filter(id => document.getElementById(id)?.checked).length === 2;
+    }
+
+    function toggleFastingMode() {
+        const cb = document.getElementById('chk_fasting');
+        const parent = document.getElementById('item_fasting');
+        if (cb.checked) parent.classList.add('done');
+        else parent.classList.remove('done');
+        autoSaveCurrentInputs();
+        updateDailyProgress();
+    }
+
+    function getDailyPercentage() {
+        const isRest = isRestDayChecked();
+        const isFasting = isFastingChecked();
+        let checked = 0;
+        let totalTasks = 0;
+
+        if (!isRest) {
+            totalTasks++;
+            if (document.getElementById('chk_workout')?.checked) checked++;
+        }
+
+        const mealsChecked = ['chk_breakfast', 'chk_lunch', 'chk_dinner'].filter(id => document.getElementById(id)?.checked).length;
+        totalTasks += 2;
+        checked += Math.min(2, mealsChecked);
+
+        ['chk_water', 'chk_sugar'].forEach(id => {
+            totalTasks++;
+            if (document.getElementById(id)?.checked) checked++;
+        });
+
+        totalTasks++;
+        const stepsVal = parseInt(document.getElementById('input_steps_count').value) || 0;
+        if (isStepsTaskDone(stepsVal)) {
+            checked++;
+        }
+
+        return Math.round((checked / totalTasks) * 100);
+    }
+
+    function isRestDayChecked() {
+        const cb = document.getElementById('chk_restday');
+        return cb ? cb.checked : false;
+    }
+
+    function applyRestDayVisual(isChecked) {
+        const restParent = document.getElementById('item_restday');
+        const workoutItem = document.getElementById('item_workout');
+        const workoutCb = document.getElementById('chk_workout');
+
+        if (isChecked) {
+            restParent.classList.add('done');
+            workoutCb.disabled = true;
+            workoutItem.style.opacity = '0.45';
+        } else {
+            restParent.classList.remove('done');
+            workoutCb.disabled = false;
+            workoutItem.style.opacity = '1';
+        }
+    }
+
+    function toggleRestDay() {
+        const cb = document.getElementById('chk_restday');
+        applyRestDayVisual(cb.checked);
+        autoSaveCurrentInputs();
+        updateDailyProgress();
+    }
+
+    function updateDailyProgress() {
+        const pct = getDailyPercentage();
+        document.getElementById('daily-progress-txt').innerText = pct + '%';
+        document.getElementById('daily-progress-bar').style.width = pct + '%';
+
+        const msg = document.getElementById('daily-status-msg');
+        if (pct === 100) msg.innerText = '🔥 يوم أسطوري ومكتمل 100%، وحش!';
+        else if (isRestDayChecked()) msg.innerText = '🛌 يوم راحة، خذ قسطك واستمر بباقي أهدافك اليوم.';
+        else if (pct >= 50) msg.innerText = '💪 تقدم ممتاز، واصل باقي الأهداف!';
+        else msg.innerText = '🎯 استمر في إنجاز أهدافك وخطواتك لليوم.';
+        updateMealsNote();
+    }
+
+    function autoSaveCurrentInputs() {
+        const dateStr = document.getElementById('checklist-date').value || getLocalDateStr();
+        const allDrafts = JSON.parse(localStorage.getItem(CHECKLIST_KEY)) || {};
+        const savedDraft = {};
+
+        checkConfig.forEach(item => {
+            const cb = document.getElementById(item.id);
+            if (cb) savedDraft[item.id] = cb.checked;
+        });
+
+        savedDraft['restday'] = isRestDayChecked();
+        savedDraft['fasting'] = isFastingChecked();
+        savedDraft['steps_count_val'] = document.getElementById('input_steps_count').value;
+        savedDraft['quick_weight_val'] = document.getElementById('input_daily_weight_quick').value;
+        savedDraft['meal_breakfast_txt'] = document.getElementById('meal_breakfast_txt').value;
+        savedDraft['meal_lunch_txt'] = document.getElementById('meal_lunch_txt').value;
+        savedDraft['meal_dinner_txt'] = document.getElementById('meal_dinner_txt').value;
+
+        savedDraft.protein = document.getElementById('input_protein').value;
+        savedDraft.kcal = document.getElementById('input_kcal').value;
+        savedDraft.water = getWater();
+        allDrafts[dateStr] = savedDraft;
+        localStorage.setItem(CHECKLIST_KEY, JSON.stringify(allDrafts));
+        clearTimeout(window._sv);
+        window._sv = setTimeout(() => {
+            const l = JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || [];
+            if (document.getElementById('checklist-date').value === dateStr && l.some(e => e.date === dateStr)) saveDayToMonthlyLog(true);
+        }, 700);
+    }
+
+    function loadDayData(dateStr) {
+        updateStepsLabelUI();
+        highlightTodayWorkoutCard();
+        const log = JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || [];
+        const entry = log.find(e => e.date === dateStr);
+        const existingWeightRec = getDailyWeights().find(w => w.date === dateStr);
+
+        if (entry) {
+            checkConfig.forEach(item => {
+                const cb = document.getElementById(item.id);
+                const isChecked = entry.tasks && entry.tasks.includes(item.name);
+                if (cb) {
+                    cb.checked = isChecked;
+                    const parent = cb.closest('.check-item');
+                    if (isChecked) parent.classList.add('done');
+                    else parent.classList.remove('done');
+                }
+            });
+
+            const restCb = document.getElementById('chk_restday');
+            restCb.checked = !!entry.restDay;
+            applyRestDayVisual(restCb.checked);
+
+            const fastingCb = document.getElementById('chk_fasting');
+            fastingCb.checked = !!entry.fasting;
+            if (fastingCb.checked) document.getElementById('item_fasting').classList.add('done');
+            else document.getElementById('item_fasting').classList.remove('done');
+
+            const stepsInput = document.getElementById('input_steps_count');
+            stepsInput.value = entry.steps !== undefined ? entry.steps : '';
+            const stepsParent = document.getElementById('item_steps');
+            if (isStepsTaskDone(parseInt(entry.steps) || 0)) stepsParent.classList.add('done');
+            else stepsParent.classList.remove('done');
+
+            const weightQuickInput = document.getElementById('input_daily_weight_quick');
+            weightQuickInput.value = existingWeightRec ? existingWeightRec.weight : (entry.weight || '');
+            if (parseFloat(weightQuickInput.value) > 0) document.getElementById('item_weight_quick').classList.add('done');
+            else document.getElementById('item_weight_quick').classList.remove('done');
+
+            document.getElementById('meal_breakfast_txt').value = (entry.meals && entry.meals.breakfast) || '';
+            document.getElementById('meal_lunch_txt').value = (entry.meals && entry.meals.lunch) || '';
+            document.getElementById('meal_dinner_txt').value = (entry.meals && entry.meals.dinner) || '';
+        } else {
+            const allDrafts = JSON.parse(localStorage.getItem(CHECKLIST_KEY)) || {};
+            const savedDraft = allDrafts[dateStr] || {};
+
+            checkConfig.forEach(item => {
+                const cb = document.getElementById(item.id);
+                if (cb) {
+                    cb.checked = !!savedDraft[item.id];
+                    const parent = cb.closest('.check-item');
+                    if (cb.checked) parent.classList.add('done');
+                    else parent.classList.remove('done');
+                }
+            });
+
+            const restCb = document.getElementById('chk_restday');
+            restCb.checked = !!savedDraft['restday'];
+            applyRestDayVisual(restCb.checked);
+
+            const fastingCb = document.getElementById('chk_fasting');
+            fastingCb.checked = !!savedDraft['fasting'];
+            if (fastingCb.checked) document.getElementById('item_fasting').classList.add('done');
+            else document.getElementById('item_fasting').classList.remove('done');
+
+            const stepsInput = document.getElementById('input_steps_count');
+            stepsInput.value = savedDraft['steps_count_val'] || '';
+            const stepsParent = document.getElementById('item_steps');
+            if (isStepsTaskDone(parseInt(stepsInput.value) || 0)) stepsParent.classList.add('done');
+            else stepsParent.classList.remove('done');
+
+            const weightQuickInput = document.getElementById('input_daily_weight_quick');
+            weightQuickInput.value = existingWeightRec ? existingWeightRec.weight : (savedDraft['quick_weight_val'] || '');
+            if (parseFloat(weightQuickInput.value) > 0) document.getElementById('item_weight_quick').classList.add('done');
+            else document.getElementById('item_weight_quick').classList.remove('done');
+
+            document.getElementById('meal_breakfast_txt').value = savedDraft['meal_breakfast_txt'] || '';
+            document.getElementById('meal_lunch_txt').value = savedDraft['meal_lunch_txt'] || '';
+            document.getElementById('meal_dinner_txt').value = savedDraft['meal_dinner_txt'] || '';
+        }
+
+        loadNutrition(entry, dateStr);
+        updateDailyProgress();
+    }
+
+    function onDateChanged() {
+        const d = document.getElementById('checklist-date').value;
+        if (d) loadDayData(d);
+    }
+
+    function resetDailyChecklist() {
+        if (!confirm('هل تريد مسح مدخلات هذا اليوم (ويشمل سجله المحفوظ إن وُجد)؟')) return;
+        checkConfig.forEach(item => {
+            const cb = document.getElementById(item.id);
+            if (cb) {
+                cb.checked = false;
+                cb.closest('.check-item').classList.remove('done');
+            }
+        });
+        document.getElementById('chk_restday').checked = false;
+        applyRestDayVisual(false);
+        document.getElementById('chk_fasting').checked = false;
+        document.getElementById('item_fasting').classList.remove('done');
+        document.getElementById('input_steps_count').value = '';
+        document.getElementById('item_steps').classList.remove('done');
+        document.getElementById('input_daily_weight_quick').value = '';
+        document.getElementById('item_weight_quick').classList.remove('done');
+        document.getElementById('meal_breakfast_txt').value = '';
+        document.getElementById('meal_lunch_txt').value = '';
+        document.getElementById('meal_dinner_txt').value = '';
+
+        const dateStr = document.getElementById('checklist-date').value || getLocalDateStr();
+        const allDrafts = JSON.parse(localStorage.getItem(CHECKLIST_KEY)) || {};
+        delete allDrafts[dateStr];
+        document.getElementById('input_protein').value = '';
+        document.getElementById('input_kcal').value = '';
+        setWater(0); updateNutritionHints();
+        localStorage.setItem(MONTHLY_LOG_KEY, JSON.stringify((JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || []).filter(e => e.date !== dateStr)));
+        renderMonthlyLog();
+        localStorage.setItem(CHECKLIST_KEY, JSON.stringify(allDrafts));
+
+        updateDailyProgress();
+    }
+
+    function startNewMonth() {
+        document.getElementById('monthly-goal-edit-box').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        toast('حدّث "🎯 هدف الشهر" من أعلى الصفحة. سجلك وتحدي السكر يستمران كما هما.');
+    }
+
+    function saveDayToMonthlyLog(silent) {
+        const dateInput = document.getElementById('checklist-date').value;
+        if (!dateInput) {
+            toast('يرجى اختيار التاريخ لحفظه في السجل.');
+            return;
+        }
+
+        const stepsVal = parseInt(document.getElementById('input_steps_count').value) || 0;
+        const quickWeightVal = parseFloat(document.getElementById('input_daily_weight_quick').value) || 0;
+        const target = getTargetSteps();
+        const stepsAchieved = isStepsTaskDone(stepsVal);
+
+        const pct = getDailyPercentage();
+        const isRest = isRestDayChecked();
+        const isFasting = isFastingChecked();
+        const completedTasks = [];
+        checkConfig.forEach(item => {
+            const el = document.getElementById(item.id);
+            if (el && el.checked) completedTasks.push(item.name);
+        });
+
+        if (isFasting) {
+            completedTasks.unshift('⏱️ صيام 16/8');
+        }
+        if (isRest) {
+            completedTasks.unshift('🛌 يوم راحة');
+        }
+
+        if (stepsVal > 0 || stepsAchieved) {
+            completedTasks.push({
+                type: 'steps',
+                achieved: stepsAchieved,
+                text: `🚶‍♂️ ${stepsVal.toLocaleString('en-US')} / ${target.toLocaleString('en-US')} خطوة`
+            });
+        }
+
+        syncDailyStepsRecord(dateInput, stepsVal);
+
+        if (quickWeightVal > 0) {
+            syncQuickWeightRecord(dateInput, quickWeightVal);
+        }
+
+        const mealsData = {
+            breakfast: document.getElementById('meal_breakfast_txt').value.trim(),
+            lunch: document.getElementById('meal_lunch_txt').value.trim(),
+            dinner: document.getElementById('meal_dinner_txt').value.trim()
+        };
+
+        let log = JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || [];
+        const existingIdx = log.findIndex(entry => entry.date === dateInput);
+
+        const newEntry = {
+            date: dateInput,
+            pct: pct,
+            tasks: completedTasks,
+            steps: stepsVal,
+            stepsTarget: target,
+            weight: quickWeightVal > 0 ? quickWeightVal : undefined,
+            meals: mealsData,
+            restDay: isRest,
+            fasting: isFasting,
+            protein: parseInt(document.getElementById('input_protein').value) || undefined,
+            kcal: parseInt(document.getElementById('input_kcal').value) || undefined,
+            water: getWater() || undefined
+        };
+
+        if (existingIdx > -1) {
+            log[existingIdx] = newEntry;
+        } else {
+            log.push(newEntry);
+        }
+
+        log.sort((a, b) => new Date(a.date) - new Date(b.date));
+        localStorage.setItem(MONTHLY_LOG_KEY, JSON.stringify(log));
+
+        if (sugarIndexOf(dateInput) < 1) localStorage.setItem(SUGAR_START_KEY, dateInput);
+        {
+            if (document.getElementById('chk_sugar')?.checked) sugarDays[dateInput] = true;
+            else delete sugarDays[dateInput];
+            localStorage.setItem(SUGAR_KEY, JSON.stringify(sugarDays));
+            renderSugarChallenge();
+        }
+
+        renderMonthlyLog();
+        if (!silent) toast('✅ تم حفظ إنجاز اليوم والخطوات والوزن والوجبات في السجل بنجاح!');
+    }
+
+    function deleteMonthlyLogEntry(date) {
+        if (!confirm(`هل تريد حذف سجل يوم ${date}؟`)) return;
+        let log = JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || [];
+        log = log.filter(e => e.date !== date);
+        localStorage.setItem(MONTHLY_LOG_KEY, JSON.stringify(log));
+        renderMonthlyLog();
+    }
+
+    function clearMonthlyLog() {
+        if (!confirm('هل أنت متأكد تماماً من مسح سجل الإنجاز بالكامل؟')) return;
+        localStorage.removeItem(MONTHLY_LOG_KEY);
+        renderMonthlyLog();
+    }
+
+    function loadDayForEdit(date) {
+        document.getElementById('checklist-date').value = date;
+        loadDayData(date);
+        window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+
+    const ARABIC_MONTH_NAMES = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    let selectedLogMonth = 'all';
+
+    function onMonthFilterChange() {
+        selectedLogMonth = document.getElementById('log-month-filter').value;
+        renderMonthlyLog();
+    }
+
+    function populateMonthFilterOptions(log) {
+        const select = document.getElementById('log-month-filter');
+        if (!select) return;
+
+        const monthsSet = new Set(log.map(e => e.date.slice(0, 7)));
+        const months = [...monthsSet].sort().reverse();
+
+        const prevValue = selectedLogMonth;
+        select.innerHTML = '<option value="all">كل الأشهر</option>';
+        months.forEach(m => {
+            const [y, mo] = m.split('-');
+            const label = `${ARABIC_MONTH_NAMES[parseInt(mo, 10) - 1]} ${y}`;
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.innerText = label;
+            select.appendChild(opt);
+        });
+
+        if (prevValue !== 'all' && months.includes(prevValue)) {
+            select.value = prevValue;
+        } else {
+            select.value = 'all';
+            selectedLogMonth = 'all';
+        }
+    }
+
+    let logMode = 'all';
+    function setLogMode(m) { logMode = m; renderMonthlyLog(); }
+
+    function logCardHtml(e) {
+        const WD = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const col = e.pct === 100 ? 'var(--success)' : e.pct >= 60 ? 'var(--accent)' : 'var(--amber)';
+        const tasks = e.tasks || [];
+        const chips = tasks.filter(t => typeof t === 'string').map(t => `<span class="badge-task">${escapeHtml(t)}</span>`).join('') || '<span style="color:var(--text-muted);font-size:.78rem">لا توجد مهام محددة</span>';
+        const st = tasks.find(t => typeof t === 'object' && t.type === 'steps');
+        let m = '';
+        if (st) m += `<span class="lg-m ${st.achieved ? 'ok' : ''}">${st.text}${st.achieved ? ' ✅' : ''}</span>`;
+        if (e.weight) m += `<span class="lg-m ok">⚖️ ${e.weight} كجم</span>`;
+        if (e.protein) m += `<span class="lg-m">🥩 ${e.protein} جم</span>`;
+        if (e.kcal) m += `<span class="lg-m">🔥 ${e.kcal} سعرة</span>`;
+        if (e.water) m += `<span class="lg-m">🥤 ${e.water} كوب</span>`;
+        const ml = e.meals || {};
+        const meals = [
+            ml.breakfast && `<div class="meal-log-item"><strong>🍳 الفطور:</strong> ${escapeHtml(ml.breakfast)}</div>`,
+            ml.lunch && `<div class="meal-log-item"><strong>🍗 الغداء:</strong> ${escapeHtml(ml.lunch)}</div>`,
+            ml.dinner && `<div class="meal-log-item"><strong>🌯 العشاء:</strong> ${escapeHtml(ml.dinner)}</div>`
+        ].filter(Boolean).join('');
+        const dt = new Date(e.date + 'T00:00:00');
+        return `<div class="lg-card" style="--c:${col}"><div class="lg-date"><b>${dt.getDate()}</b><span>${WD[dt.getDay()]}</span></div><div class="lg-body"><div class="lg-row1"><span>${e.date}</span><span class="lg-pct" style="color:${col}">${e.pct}%</span></div><div class="lg-bar"><i style="width:${e.pct}%;background:${col}"></i></div><div>${chips}</div>${m ? `<div class="lg-metrics">${m}</div>` : ''}${meals ? `<details class="lg-meals"><summary>🍽️ الوجبات المسجلة</summary>${meals}</details>` : ''}</div><div class="lg-acts"><button title="تعديل" onclick="loadDayForEdit('${e.date}')">✏️</button><button title="حذف" onclick="deleteMonthlyLogEntry('${e.date}')">🗑️</button></div></div>`;
+    }
+
+    function renderMonthlyLog() {
+        const fullLog = JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || [];
+        populateMonthFilterOptions(fullLog);
+        const log = selectedLogMonth === 'all' ? fullLog : fullLog.filter(e => e.date.slice(0, 7) === selectedLogMonth);
+        document.querySelectorAll('.lg-chip').forEach(b => b.classList.toggle('on', b.dataset.m === logMode));
+        const set = (id, v) => { document.getElementById(id).innerText = v; };
+        const avg = log.length ? Math.round(log.reduce((a, e) => a + e.pct, 0) / log.length) : 0;
+        const streaks = computeLogStreaks(fullLog);
+        set('log-total-days', log.length);
+        set('log-perfect-days', log.filter(e => e.pct === 100).length);
+        set('log-avg-pct', avg + '%');
+        set('log-current-streak', log.length ? streaks.current : 0);
+        set('log-best-streak', log.length ? streaks.best : 0);
+
+        let shown = log;
+        if (logMode === 'perfect') shown = log.filter(e => e.pct === 100);
+        else if (logMode === 'low') shown = log.filter(e => e.pct < 60);
+
+        const box = document.getElementById('log-cards');
+        if (!shown.length) {
+            box.innerHTML = `<div class="lg-month" style="justify-content:center">${!fullLog.length ? 'لا توجد أيام مسجلة بعد. حدد مهامك واكتب وجباتك ثم اضغط «حفظ اليوم».' : 'لا توجد أيام مطابقة لهذا العرض.'}</div>`;
+            updateReminderBanner();
+            return;
+        }
+        const grp = {};
+        [...shown].sort((a, b) => a.date < b.date ? 1 : -1).forEach(e => { (grp[e.date.slice(0, 7)] = grp[e.date.slice(0, 7)] || []).push(e); });
+        let html = '';
+        Object.keys(grp).sort().reverse().forEach(mk => {
+            const arr = grp[mk], parts = mk.split('-');
+            const a = Math.round(arr.reduce((s, e) => s + e.pct, 0) / arr.length);
+            html += `<div class="lg-month"><b>${ARABIC_MONTH_NAMES[parseInt(parts[1], 10) - 1]} ${parts[0]}</b><span>${arr.length} يوم • متوسط ${a}%</span></div>`;
+            arr.forEach(e => { html += logCardHtml(e); });
+        });
+        box.innerHTML = html;
+        updateReminderBanner();
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function computeLogStreaks(logAsc) {
+        const today = getLocalDateStr();
+        const arr = logAsc.filter(e => !(e.date === today && e.pct < 100));
+        let run = 0, best = 0, prev = null;
+        arr.forEach(e => {
+            if (e.pct === 100) {
+                run = (prev && Math.round((new Date(e.date) - new Date(prev)) / 86400000) === 1) ? run + 1 : 1;
+                best = Math.max(best, run);
+                prev = e.date;
+            } else { run = 0; prev = null; }
+        });
+        const gap = prev ? Math.round((new Date(today) - new Date(prev)) / 86400000) : 99;
+        return { current: gap <= 1 ? run : 0, best: best };
+    }
+
+    /* ----------------------------------------------------
+       2. تحدي قطع السكر (عدد أيام قابل للتعديل)
+    ---------------------------------------------------- */
+    const SUGAR_KEY = 'sugar_challenge_month_days';
+    const SUGAR_TARGET_KEY = 'sugar_challenge_target_days';
+    const SUGAR_START_KEY = 'sugar_challenge_start';
+    let sugarDays = JSON.parse(localStorage.getItem(SUGAR_KEY)) || {};
+
+    (function migrateSugar() {
+        const log = JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || [];
+        const ks = Object.keys(sugarDays);
+        if (ks.some(k => /^\d{1,2}$/.test(k))) {
+            const ref = log.length ? log[log.length - 1].date.slice(0, 7) : getLocalDateStr().slice(0, 7);
+            const n = {};
+            ks.forEach(k => { if (/^\d{1,2}$/.test(k) && sugarDays[k]) n[ref + '-' + String(k).padStart(2, '0')] = true; });
+            sugarDays = n;
+            localStorage.setItem(SUGAR_KEY, JSON.stringify(n));
+            if (!localStorage.getItem(SUGAR_START_KEY)) localStorage.setItem(SUGAR_START_KEY, ref + '-01');
+        }
+        if (!localStorage.getItem(SUGAR_START_KEY)) localStorage.setItem(SUGAR_START_KEY, log.length ? log[0].date : getLocalDateStr());
+    })();
+
+    function addDaysStr(ds, n) { const d = new Date(ds + 'T00:00:00'); d.setDate(d.getDate() + n); return getLocalDateStr(d); }
+    function getSugarStart() { return localStorage.getItem(SUGAR_START_KEY) || getLocalDateStr(); }
+    function sugarIndexOf(ds) { return Math.round((new Date(ds + 'T00:00:00') - new Date(getSugarStart() + 'T00:00:00')) / 86400000) + 1; }
+
+    (function backfillSugar() {
+        if (Object.keys(sugarDays).length) return;
+        (JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || []).forEach(e => {
+            if (e.tasks && e.tasks.includes('بدون سكر')) sugarDays[e.date] = true;
+        });
+        const ks = Object.keys(sugarDays).sort();
+        if (ks.length) {
+            localStorage.setItem(SUGAR_KEY, JSON.stringify(sugarDays));
+            const st = localStorage.getItem(SUGAR_START_KEY);
+            if (!st || ks[0] < st) localStorage.setItem(SUGAR_START_KEY, ks[0]);
+        }
+    })();
+
+    const SG_MS = [1, 3, 7, 14, 21, 30, 60, 90, 180, 365, 730, 1095];
+    const SG_IC = ['🌱', '🌿', '🔥', '⚡', '💪', '🏅', '🥈', '🥇', '💎', '👑', '🎖️', '🏆'];
+    const SG_LB = ['يوم', '3 أيام', 'أسبوع', 'أسبوعان', '21 يوم', 'شهر', 'شهران', '3 أشهر', '6 أشهر', 'سنة', 'سنتان', '3 سنوات'];
+    const SG_MN = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    let sgView = null, sgPop = null;
+
+    function updateSugarLabelsUI() {
+        const si = document.getElementById('sugar-start-input');
+        if (si) si.value = getSugarStart();
+        refreshDynamicTexts();
+    }
+
+    function setSugarStart(v) {
+        if (!v) return;
+        if (v > getLocalDateStr()) { toast('تاريخ البداية لا يمكن أن يكون في المستقبل.'); updateSugarLabelsUI(); return; }
+        localStorage.setItem(SUGAR_START_KEY, v);
+        renderSugarChallenge();
+        updateDayCounter();
+    }
+
+    function sugarStats() {
+        const start = getSugarStart(), today = getLocalDateStr();
+        const total = Math.max(1, sugarIndexOf(today));
+        let done = 0, run = 0, best = 0;
+        const flags = [];
+        for (let i = 0; i < total; i++) {
+            const on = Boolean(sugarDays[addDaysStr(start, i)]);
+            flags.push(on);
+            if (on) { done++; run++; best = Math.max(best, run); } else run = 0;
+        }
+        let i = flags.length - 1, cur = 0;
+        if (!flags[i]) i--;
+        for (; i >= 0 && flags[i]; i--) cur++;
+        return { total, done, best, cur, rate: Math.round(done / total * 100), start, today };
+    }
+
+    function sgMonth(d) {
+        const n = new Date();
+        if (!sgView) sgView = { y: n.getFullYear(), m: n.getMonth() };
+        sgView.m += d;
+        if (sgView.m < 0) { sgView.m = 11; sgView.y--; }
+        if (sgView.m > 11) { sgView.m = 0; sgView.y++; }
+        if (sgView.y > n.getFullYear() || (sgView.y === n.getFullYear() && sgView.m > n.getMonth())) sgView = { y: n.getFullYear(), m: n.getMonth() };
+        renderSugarChallenge();
+    }
+
+    function renderSugarChallenge() {
+        updateSugarLabelsUI();
+        const st = sugarStats(), todayOn = Boolean(sugarDays[st.today]);
+        const prev = [0, ...SG_MS].filter(m => m <= st.cur).pop();
+        const next = SG_MS.find(m => m > st.cur);
+        const frac = next ? (st.cur - prev) / (next - prev) : 1;
+        document.getElementById('sg-ring-fg').style.strokeDashoffset = 326.7 * (1 - frac);
+        document.getElementById('sg-streak').innerText = st.cur;
+        const c = st.cur;
+        document.getElementById('sg-msg').innerText = c === 0 ? 'ابدأ اليوم، يوم واحد نظيف يكفي لتبدأ السلسلة.' : c < 3 ? 'بداية ممتازة، لا تكسر السلسلة!' : c < 7 ? 'ثبات جميل، اقتربت من أسبوعك الأول.' : c < 14 ? 'أسبوع كامل، أنت تبني عادة حقيقية.' : c < 30 ? 'استمر، عادة جديدة تتشكل.' : c < 90 ? 'شهر كامل وأكثر، انضباط يُحسب لك.' : 'صار هذا أسلوب حياة.';
+        const btn = document.getElementById('sg-today-btn');
+        btn.className = 'sg-today' + (todayOn ? ' done' : '');
+        btn.innerText = todayOn ? '✅ اليوم نظيف (اضغط للتراجع)' : '🚫 علّم اليوم كيوم نظيف';
+        document.getElementById('sg-total').innerText = st.done;
+        document.getElementById('sg-best').innerText = st.best;
+        document.getElementById('sg-rate').innerText = st.rate + '%';
+        document.getElementById('sg-days').innerText = st.total;
+        const nl = next ? SG_LB[SG_MS.indexOf(next)] : '';
+        document.getElementById('sg-next-txt').innerText = next ? `باقي ${next - st.cur} يوم لوسام «${nl}»` : 'وصلت لأعلى وسام 👑';
+        document.getElementById('sg-next-bar').style.width = Math.round(frac * 100) + '%';
+        document.getElementById('sg-badges').innerHTML = SG_MS.map((m, i) => `<div class="sg-badge ${st.best >= m ? 'on' : ''}"><i>${SG_IC[i]}</i>${SG_LB[i]}</div>`).join('');
+        document.getElementById('header-sugar-days').innerText = `${st.cur} يوم متتالي`;
+
+        const n = new Date();
+        if (!sgView) sgView = { y: n.getFullYear(), m: n.getMonth() };
+        document.getElementById('sg-month-label').innerText = `${SG_MN[sgView.m]} ${sgView.y}`;
+        const dim = new Date(sgView.y, sgView.m + 1, 0).getDate();
+        const lead = (new Date(sgView.y, sgView.m, 1).getDay() + 1) % 7;
+        let h = ['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'].map(x => `<div class="sg-wd">${x}</div>`).join('');
+        for (let i = 0; i < lead; i++) h += '<div></div>';
+        for (let d = 1; d <= dim; d++) {
+            const ds = getLocalDateStr(new Date(sgView.y, sgView.m, d));
+            const off = ds < st.start || ds > st.today, on = Boolean(sugarDays[ds]);
+            const cls = ['sg-d'];
+            if (off) cls.push('off'); else if (on) cls.push('done'); else if (ds < st.today) cls.push('miss');
+            if (ds === st.today) cls.push('today');
+            if (ds === sgPop) cls.push('pop');
+            h += `<div class="${cls.join(' ')}" title="${ds}" ${off ? '' : `onclick="toggleSugarDay('${ds}')"`}>${on ? '✓' : d}</div>`;
+        }
+        document.getElementById('sg-cal').innerHTML = h;
+        sgPop = null;
+        updateReminderBanner();
+    }
+
+    function toggleSugarDay(ds) {
+        if (ds > getLocalDateStr()) return;
+        const before = sugarStats();
+        if (sugarDays[ds]) delete sugarDays[ds]; else sugarDays[ds] = true;
+        localStorage.setItem(SUGAR_KEY, JSON.stringify(sugarDays));
+        if (sugarIndexOf(ds) < 1) localStorage.setItem(SUGAR_START_KEY, ds);
+        const lg = JSON.parse(localStorage.getItem(MONTHLY_LOG_KEY)) || [];
+        const e = lg.find(x => x.date === ds);
+        if (e) {
+            e.tasks = (e.tasks || []).filter(t => t !== 'بدون سكر');
+            if (sugarDays[ds]) e.tasks.push('بدون سكر');
+            localStorage.setItem(MONTHLY_LOG_KEY, JSON.stringify(lg));
+            renderMonthlyLog();
+        }
+        const cb = document.getElementById('chk_sugar');
+        if (cb && document.getElementById('checklist-date').value === ds) {
+            cb.checked = Boolean(sugarDays[ds]);
+            cb.closest('.check-item').classList.toggle('done', cb.checked);
+            updateDailyProgress();
+        }
+        sgPop = ds;
+        renderSugarChallenge();
+        updateDayCounter();
+        const after = sugarStats();
+        const hit = SG_MS.findIndex(m => after.cur >= m && before.cur < m);
+        if (sugarDays[ds] && hit > -1) toast(`🎉 وسام جديد: ${SG_IC[hit]} ${SG_LB[hit]} بدون سكر!`);
+    }
+
+    function resetSugarChallenge() {
+        if (!confirm('هل تريد إعادة بدء تحدي السكر من اليوم؟ سيتم تصفير أيام التحدي المعلّمة.')) return;
+        sugarDays = {};
+        localStorage.removeItem(SUGAR_KEY);
+        localStorage.setItem(SUGAR_START_KEY, getLocalDateStr());
+        sgView = null;
+        renderSugarChallenge();
+        updateDayCounter();
+    }
+
+    /* ----------------------------------------------------
+       3. متابعة الوزن وتسجيل كل الأوزان
+    ---------------------------------------------------- */
+    const DAILY_KEY = 'daily_weights_month';
+
+    function getDailyWeights() {
+        return JSON.parse(localStorage.getItem(DAILY_KEY)) || [];
+    }
+
+    function syncQuickWeightRecord(dateVal, weightVal) {
+        if (!dateVal || isNaN(weightVal) || weightVal <= 0) return;
+        let records = getDailyWeights();
+        const existingIdx = records.findIndex(r => r.date === dateVal);
+        if (existingIdx > -1) {
+            records[existingIdx].weight = weightVal;
+        } else {
+            records.push({ date: dateVal, weight: weightVal });
+        }
+        records.sort((a, b) => new Date(a.date) - new Date(b.date));
+        localStorage.setItem(DAILY_KEY, JSON.stringify(records));
+        renderDailyWeights();
+    }
+
+    function addDailyWeight() {
+        const dateVal = document.getElementById('daily-date').value;
+        const weightVal = parseFloat(document.getElementById('daily-weight').value);
+
+        if (!dateVal || isNaN(weightVal) || weightVal <= 0) {
+            toast('يرجى تحديد التاريخ وإدخال وزن صحيح.');
+            return;
+        }
+
+        syncQuickWeightRecord(dateVal, weightVal);
+        document.getElementById('daily-weight').value = '';
+
+        if (document.getElementById('checklist-date').value === dateVal) {
+            document.getElementById('input_daily_weight_quick').value = weightVal;
+            document.getElementById('item_weight_quick').classList.add('done');
+        }
+    }
+
+    function deleteDailyWeight(date) {
+        let records = getDailyWeights().filter(r => r.date !== date);
+        localStorage.setItem(DAILY_KEY, JSON.stringify(records));
+        renderDailyWeights();
+    }
+
+    function renderDailyWeights() {
+        renderGoalProgress();
+        const records = getDailyWeights();
+        const tbody = document.getElementById('daily-weight-list');
+        tbody.innerHTML = '';
+
+        if (records.length === 0) {
+            document.getElementById('stat-start').innerText = '-';
+            document.getElementById('stat-current').innerText = '-';
+            document.getElementById('stat-diff').innerText = '-';
+            document.getElementById('stat-min').innerText = '-';
+            drawWeightChart([]);
+            renderWeeklyAverages();
+            updateReminderBanner();
+            return;
+        }
+
+        const weights = records.map(r => r.weight);
+        const startW = weights[0];
+        const currentW = weights[weights.length - 1];
+        const diff = (currentW - startW).toFixed(1);
+        const minW = Math.min(...weights);
+
+        document.getElementById('stat-start').innerText = startW + ' كجم';
+        document.getElementById('stat-current').innerText = currentW + ' كجم';
+
+        const diffEl = document.getElementById('stat-diff');
+        diffEl.innerText = (diff > 0 ? `+${diff}` : diff) + ' كجم';
+        diffEl.style.color = diff < 0 ? 'var(--success)' : (diff > 0 ? '#ef4444' : 'var(--text-main)');
+
+        document.getElementById('stat-min').innerText = minW + ' كجم';
+
+        [...records].reverse().forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td data-label="التاريخ">${r.date}</td>
+                <td data-label="الوزن المسجل" style="color:var(--accent); font-weight:bold;">${r.weight} كجم</td>
+                <td class="action-col" data-label="حذف"><button class="calc-btn" style="background:#ef4444; padding:2px 8px; font-size:0.75rem;" onclick="deleteDailyWeight('${r.date}')">حذف</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        drawWeightChart(records);
+        renderWeeklyAverages();
+        updateReminderBanner();
+    }
+
+    function getSaudiWeekStart(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        const day = d.getDay();
+        const diff = (day - 6 + 7) % 7;
+        d.setDate(d.getDate() - diff);
+        return getLocalDateStr(d);
+    }
+
+    function renderWeeklyAverages() {
+        const box = document.getElementById('weeklyAvgList');
+        if (!box) return;
+
+        const records = getDailyWeights();
+        if (records.length === 0) {
+            box.innerHTML = '<p style="color:var(--text-muted); font-size:0.88rem;">سجّل وزنك اليومي أولاً لتظهر هنا متوسطات الأسابيع تلقائياً.</p>';
+            return;
+        }
+
+        const weeksMap = {};
+        records.forEach(r => {
+            const key = getSaudiWeekStart(r.date);
+            if (!weeksMap[key]) weeksMap[key] = [];
+            weeksMap[key].push(r.weight);
+        });
+
+        const weekKeys = Object.keys(weeksMap).sort((a, b) => new Date(a) - new Date(b));
+
+        let rows = '';
+        let prevAvg = null;
+        weekKeys.forEach((key, idx) => {
+            const vals = weeksMap[key];
+            const avg = Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 100) / 100;
+
+            let diffStr = '—';
+            if (prevAvg !== null) {
+                const d = Math.round((avg - prevAvg) * 100) / 100;
+                diffStr = d < 0 ? `📉 ${d} كجم` : (d > 0 ? `📈 +${d} كجم` : `➖ ثابت`);
+            }
+
+            const startDate = new Date(key + 'T00:00:00');
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 6);
+            const startLabel = startDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+            const endLabel = endDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+
+            rows += `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:10px 14px; background:var(--card-sub); border-radius:8px; margin-bottom:8px; font-size:0.9rem;">
+                <span style="color:var(--accent); font-weight:bold;">أسبوع ${idx + 1}</span>
+                <span>${startLabel} - ${endLabel}</span>
+                <strong>${avg} كجم</strong>
+                <span style="color:var(--text-muted); font-size:0.8rem;">(${vals.length} ${vals.length === 1 ? 'يوم' : 'أيام'})</span>
+                <span>${diffStr}</span>
+            </div>`;
+            prevAvg = avg;
+        });
+
+        box.innerHTML = rows;
+    }
+
+    function drawWeightChart(data, forcePrintMode) {
+        const canvas = document.getElementById('weightCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const isPrint = forcePrintMode || document.body.classList.contains('print-mode');
+
+        canvas.width = canvas.parentElement.clientWidth * dpr;
+        canvas.height = canvas.parentElement.clientHeight * dpr;
+        ctx.scale(dpr, dpr);
+
+        const w = canvas.parentElement.clientWidth;
+        const h = canvas.parentElement.clientHeight;
+        ctx.clearRect(0, 0, w, h);
+
+        if (data.length < 2) {
+            ctx.fillStyle = isPrint ? '#334155' : '#94a3b8';
+            ctx.font = '13px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('سجّل وزنين على الأقل لرؤية المخطط البياني', w / 2, h / 2);
+            return;
+        }
+
+        const weights = data.map(d => d.weight);
+        const min = Math.min(...weights) - 0.5;
+        const max = Math.max(...weights) + 0.5;
+        const range = max - min || 1;
+
+        const pad = 30;
+        const cWidth = w - pad * 2;
+        const cHeight = h - pad * 2;
+
+        ctx.beginPath();
+        ctx.strokeStyle = isPrint ? '#0284c7' : '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+
+        data.forEach((pt, i) => {
+            const x = pad + (i / (data.length - 1)) * cWidth;
+            const y = pad + cHeight - ((pt.weight - min) / range) * cHeight;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        data.forEach((pt, i) => {
+            const x = pad + (i / (data.length - 1)) * cWidth;
+            const y = pad + cHeight - ((pt.weight - min) / range) * cHeight;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#f97316';
+            ctx.fill();
+
+            ctx.fillStyle = isPrint ? '#0f172a' : '#f8fafc';
+            ctx.font = 'bold 11px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${pt.weight}`, x, y - 8);
+        });
+    }
+
+    /* ----------------------------------------------------
+       3ب. متابعة الخطوات اليومية مع حساب السلسلة المتتالية بدقة
+    ---------------------------------------------------- */
+    const STEPS_KEY = 'daily_steps_month';
+    const STEPS_GOAL_KEY = 'daily_steps_goal';
+    const CALORIES_PER_STEP = 0.04;
+
+    function getStepsGoal() {
+        const g = parseInt(localStorage.getItem(STEPS_GOAL_KEY));
+        return (!isNaN(g) && g > 0) ? g : null;
+    }
+
+    function saveStepsGoal() {
+        const val = parseInt(document.getElementById('steps-goal').value);
+        const savedLabel = document.getElementById('steps-goal-saved');
+        if (!isNaN(val) && val > 0) {
+            localStorage.setItem(STEPS_GOAL_KEY, val);
+            savedLabel.innerText = `✅ تم حفظ الهدف: ${val.toLocaleString('en-US')} خطوة/يوم`;
+        } else {
+            savedLabel.innerText = '';
+        }
+        updateStepsLabelUI();
+        onStepsInputChanged();
+        renderDailySteps();
+    }
+
+    function saveStepsGoalFromHeader() {
+        const val = parseInt(document.getElementById('steps-goal-header-input').value);
+        if (isNaN(val) || val <= 0) {
+            toast('يرجى إدخال رقم صحيح لعدد الخطوات.');
+            return;
+        }
+        localStorage.setItem(STEPS_GOAL_KEY, val);
+
+        const otherInput = document.getElementById('steps-goal');
+        if (otherInput) otherInput.value = val;
+        const savedLabel = document.getElementById('steps-goal-saved');
+        if (savedLabel) savedLabel.innerText = `✅ تم حفظ الهدف: ${val.toLocaleString('en-US')} خطوة/يوم`;
+
+        updateStepsLabelUI();
+        onStepsInputChanged();
+        renderDailySteps();
+        toggleStatEdit('steps');
+    }
+
+    function getDailySteps() {
+        return JSON.parse(localStorage.getItem(STEPS_KEY)) || [];
+    }
+
+    function syncDailyStepsRecord(dateVal, stepsVal) {
+        if (!dateVal) return;
+        let records = getDailySteps();
+        const existingIdx = records.findIndex(r => r.date === dateVal);
+        if (stepsVal > 0) {
+            if (existingIdx > -1) records[existingIdx].steps = stepsVal;
+            else records.push({ date: dateVal, steps: stepsVal });
+        } else if (existingIdx > -1) {
+            records.splice(existingIdx, 1);
+        }
+        records.sort((a, b) => new Date(a.date) - new Date(b.date));
+        localStorage.setItem(STEPS_KEY, JSON.stringify(records));
+        renderDailySteps();
+    }
+
+    function deleteDailySteps(date) {
+        let records = getDailySteps().filter(r => r.date !== date);
+        localStorage.setItem(STEPS_KEY, JSON.stringify(records));
+        renderDailySteps();
+    }
+
+    function renderDailySteps() {
+        const records = getDailySteps();
+        const tbody = document.getElementById('daily-steps-list');
+        const goal = getStepsGoal() || 5000;
+
+        const goalInput = document.getElementById('steps-goal');
+        if (goal && document.activeElement !== goalInput) goalInput.value = goal;
+
+        tbody.innerHTML = '';
+
+        const progressWrap = document.getElementById('steps-goal-progress-wrap');
+        const progressBar = document.getElementById('steps-goal-progress-bar');
+        const progressLabel = document.getElementById('steps-goal-progress-label');
+
+        if (records.length === 0) {
+            document.getElementById('steps-stat-avg').innerText = '-';
+            document.getElementById('steps-stat-max').innerText = '-';
+            document.getElementById('steps-stat-total').innerText = '-';
+            document.getElementById('steps-stat-streak').innerText = '-';
+            document.getElementById('steps-stat-calories').innerText = '-';
+            progressWrap.style.display = 'none';
+            drawStepsChart([], goal);
+            return;
+        }
+
+        const stepsArr = records.map(r => r.steps);
+        const total = stepsArr.reduce((a, b) => a + b, 0);
+        const avg = Math.round(total / stepsArr.length);
+        const max = Math.max(...stepsArr);
+        const calories = Math.round(total * CALORIES_PER_STEP);
+
+        document.getElementById('steps-stat-avg').innerText = avg.toLocaleString('en-US');
+        document.getElementById('steps-stat-max').innerText = max.toLocaleString('en-US');
+        document.getElementById('steps-stat-total').innerText = total.toLocaleString('en-US');
+        document.getElementById('steps-stat-calories').innerText = calories.toLocaleString('en-US') + ' سعرة';
+
+        let streak = 0;
+        if (goal) {
+            const sortedDesc = [...records].filter(r => !(r.date === getLocalDateStr() && r.steps < goal)).sort((a, b) => new Date(b.date) - new Date(a.date));
+            let prevDate = null;
+            for (const r of sortedDesc) {
+                if (r.steps >= goal) {
+                    if (prevDate === null) {
+                        streak = 1;
+                        prevDate = r.date;
+                    } else {
+                        const diffDays = Math.round((new Date(prevDate) - new Date(r.date)) / 86400000);
+                        if (diffDays === 1) {
+                            streak++;
+                            prevDate = r.date;
+                        } else {
+                            break;
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+            if (sortedDesc.length && Math.round((new Date(getLocalDateStr()) - new Date(sortedDesc[0].date)) / 86400000) > 1) streak = 0;
+            document.getElementById('steps-stat-streak').innerText = streak + ' يوم';
+        } else {
+            document.getElementById('steps-stat-streak').innerText = '-';
+        }
+
+        if (goal) {
+            const last = records[records.length - 1];
+            const pct = Math.min(100, Math.round((last.steps / goal) * 100));
+            progressWrap.style.display = 'block';
+            progressBar.style.width = pct + '%';
+            progressBar.style.background = pct >= 100 ? 'var(--success)' : 'var(--primary)';
+            progressLabel.innerText = pct + '%';
+        } else {
+            progressWrap.style.display = 'none';
+        }
+
+        [...records].reverse().forEach(r => {
+            const achieved = goal ? (r.steps >= goal) : null;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td data-label="التاريخ">${r.date}</td>
+                <td data-label="عدد الخطوات" style="color:var(--accent); font-weight:bold;">${r.steps.toLocaleString('en-US')}</td>
+                <td data-label="الهدف محقق؟">${achieved === null ? '—' : (achieved ? '✅' : '❌')}</td>
+                <td class="action-col" data-label="حذف"><button class="calc-btn" style="background:#ef4444; padding:2px 8px; font-size:0.75rem;" onclick="deleteDailySteps('${r.date}')">حذف</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        drawStepsChart(records, goal);
+    }
+
+    function drawStepsChart(data, goal) {
+        const canvas = document.getElementById('stepsCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+
+        canvas.width = canvas.parentElement.clientWidth * dpr;
+        canvas.height = canvas.parentElement.clientHeight * dpr;
+        ctx.scale(dpr, dpr);
+
+        const w = canvas.parentElement.clientWidth;
+        const h = canvas.parentElement.clientHeight;
+        ctx.clearRect(0, 0, w, h);
+
+        if (data.length === 0) {
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '13px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('سجّل خطوات يوم واحد على الأقل لرؤية المخطط البياني', w / 2, h / 2);
+            return;
+        }
+
+        const stepsVals = data.map(d => d.steps);
+        const max = Math.max(...stepsVals, goal || 0) * 1.15;
+
+        const pad = 30;
+        const cWidth = w - pad * 2;
+        const cHeight = h - pad * 2;
+        const barGap = 6;
+        const barWidth = Math.max(4, cWidth / data.length - barGap);
+
+        if (goal) {
+            const goalY = pad + cHeight - (goal / max) * cHeight;
+            ctx.beginPath();
+            ctx.setLineDash([5, 4]);
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 1.5;
+            ctx.moveTo(pad, goalY);
+            ctx.lineTo(w - pad, goalY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        data.forEach((pt, i) => {
+            const x = pad + i * (cWidth / data.length) + barGap / 2;
+            const barH = (pt.steps / max) * cHeight;
+            const y = pad + cHeight - barH;
+
+            ctx.fillStyle = (goal && pt.steps >= goal) ? '#22c55e' : '#38bdf8';
+            ctx.fillRect(x, y, barWidth, barH);
+        });
+    }
+
+    const HEIGHT_KEY = 'fitness_height_cm';
+
+    /* ----------------------------------------------------
+       هدف الشهر (وزن البداية والهدف) - قابل للتعديل من الواجهة
+    ---------------------------------------------------- */
+    const MONTHLY_GOAL_KEY = 'monthly_weight_goal_range';
+
+    function loadMonthlyGoal() {
+        let goal = null;
+        try { goal = JSON.parse(localStorage.getItem(MONTHLY_GOAL_KEY)); } catch (e) { goal = null; }
+
+        const display = document.getElementById('header-monthly-goal');
+        if (goal && goal.from != null && goal.to != null) {
+            display.innerText = `${goal.from} ⬅ ${goal.to} كجم`;
+            document.getElementById('goal-from-input').value = goal.from;
+            document.getElementById('goal-to-input').value = goal.to;
+        } else {
+            document.getElementById('header-monthly-goal').innerText = `86 ⬅ 80 كجم`;
+            document.getElementById('goal-from-input').value = 86;
+            document.getElementById('goal-to-input').value = 80;
+        }
+    }
+
+    function toggleMonthlyGoalEdit() {
+        const box = document.getElementById('monthly-goal-edit-box');
+        box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+    }
+
+    function saveMonthlyGoal() {
+        const from = parseFloat(document.getElementById('goal-from-input').value);
+        const to = parseFloat(document.getElementById('goal-to-input').value);
+
+        if (isNaN(from) || isNaN(to) || from <= 0 || to <= 0) {
+            toast('يرجى إدخال أرقام صحيحة للوزن (من وإلى).');
+            return;
+        }
+
+        const goal = { from, to };
+        localStorage.setItem(MONTHLY_GOAL_KEY, JSON.stringify(goal));
+        document.getElementById('header-monthly-goal').innerText = `${from} ⬅ ${to} كجم`;
+        refreshDynamicTexts(); renderGoalProgress();
+        toggleMonthlyGoalEdit();
+    }
+
+    /* ----------------------------------------------------
+       إحصائيات الهيدر القابلة للتعديل: السعرات، البروتين، الماء
+    ---------------------------------------------------- */
+    const HEADER_STATS = {
+        water:    { key: 'header_stat_water',    displayId: 'header-water',    fromId: 'water-from-input',    toId: 'water-to-input',    unit: ' لتر', sep: ' – ', defaultFrom: 2.5,  defaultTo: 3 }
+    };
+
+    function toggleStatEdit(type) {
+        const box = document.getElementById('edit-box-' + type);
+        if (!box) return;
+        box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+    }
+
+    function loadHeaderStat(type) {
+        const cfg = HEADER_STATS[type];
+        let val = null;
+        try { val = JSON.parse(localStorage.getItem(cfg.key)); } catch (e) { val = null; }
+
+        const from = (val && val.from != null) ? val.from : cfg.defaultFrom;
+        const to = (val && val.to != null) ? val.to : cfg.defaultTo;
+
+        document.getElementById(cfg.displayId).innerText = `${from}${cfg.sep}${to}${cfg.unit}`;
+        document.getElementById(cfg.fromId).value = from;
+        document.getElementById(cfg.toId).value = to;
+
+        if (type === 'water') {
+            const waterTaskEl = document.getElementById('water_task_label');
+            if (waterTaskEl) waterTaskEl.innerText = `💧 شربت ${from} - ${to} لتر ماء`;
+        }
+    }
+
+    function saveHeaderStat(type) {
+        const cfg = HEADER_STATS[type];
+        const from = parseFloat(document.getElementById(cfg.fromId).value);
+        const to = parseFloat(document.getElementById(cfg.toId).value);
+
+        if (isNaN(from) || isNaN(to) || from <= 0 || to <= 0) {
+            toast('يرجى إدخال أرقام صحيحة.');
+            return;
+        }
+
+        localStorage.setItem(cfg.key, JSON.stringify({ from, to }));
+        document.getElementById(cfg.displayId).innerText = `${from}${cfg.sep}${to}${cfg.unit}`;
+        if (type === 'water') {
+            const waterTaskEl = document.getElementById('water_task_label');
+            if (waterTaskEl) waterTaskEl.innerText = `💧 شربت ${from} - ${to} لتر ماء`;
+        }
+        toggleStatEdit(type);
+    }
+
+    function calcBMI() {
+        const heightInput = document.getElementById('bmi-height');
+        let height = parseFloat(heightInput.value);
+        const resBox = document.getElementById('bmiResult');
+
+        if (!height || height <= 0) {
+            const savedHeight = parseFloat(localStorage.getItem(HEIGHT_KEY));
+            if (savedHeight) {
+                height = savedHeight;
+                heightInput.value = savedHeight;
+            }
+        }
+
+        const weights = getDailyWeights();
+        const currentWeight = weights.length ? weights[weights.length - 1].weight : null;
+
+        if (!height || height <= 0) {
+            resBox.style.display = 'block';
+            resBox.style.background = '#3b1c1c';
+            resBox.style.borderColor = '#ef4444';
+            resBox.style.color = '#fca5a5';
+            resBox.innerText = 'يرجى إدخال الطول بالسنتيمتر أولاً.';
+            return;
+        }
+
+        if (!currentWeight) {
+            resBox.style.display = 'block';
+            resBox.style.background = '#3b1c1c';
+            resBox.style.borderColor = '#ef4444';
+            resBox.style.color = '#fca5a5';
+            resBox.innerText = 'سجّل وزناً واحداً على الأقل في الجدول أولاً.';
+            return;
+        }
+
+        localStorage.setItem(HEIGHT_KEY, height);
+
+        const heightM = height / 100;
+        const bmi = Math.round((currentWeight / (heightM * heightM)) * 10) / 10;
+
+        let category, color;
+        if (bmi < 18.5) { category = 'نقص في الوزن'; color = '#38bdf8'; }
+        else if (bmi < 25) { category = 'وزن طبيعي ✅'; color = 'var(--success)'; }
+        else if (bmi < 30) { category = 'زيادة وزن'; color = 'var(--amber)'; }
+        else { category = 'سمنة'; color = '#ef4444'; }
+
+        resBox.style.display = 'block';
+        resBox.style.background = '#11271e';
+        resBox.style.borderColor = color;
+        resBox.style.color = color;
+        resBox.innerHTML = `📏 مؤشر كتلة جسمك: <strong>${bmi}</strong> — التصنيف: <strong>${category}</strong> (بناءً على آخر وزن مسجّل: ${currentWeight} كجم)`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const today = new Date();
+        const todayStr = getLocalDateStr(today);
+        document.getElementById('checklist-date').value = todayStr;
+        document.getElementById('daily-date').value = todayStr;
+
+        newQuote();
+        updateStepsLabelUI();
+        const stepsHeaderInput = document.getElementById('steps-goal-header-input');
+        if (stepsHeaderInput) stepsHeaderInput.value = getStepsGoal() || 5000;
+        loadDayData(todayStr);
+        renderMonthlyLog();
+        renderSugarChallenge();
+        renderDailyWeights();
+        renderDailySteps();
+        renderWeeklyAverages();
+        updateBackupStatus();
+        updateReminderBanner();
+        highlightTodayWorkoutCard();
+
+        const savedHeight = localStorage.getItem(HEIGHT_KEY);
+        if (savedHeight) document.getElementById('bmi-height').value = savedHeight;
+
+        loadMonthlyGoal();
+        loadHeaderStat('water');
+        updateNutritionHints(); updateDayCounter(); refreshDynamicTexts(); renderGoalProgress();
+        if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+        moveTabIndicator();
+        window.addEventListener('resize', moveTabIndicator);
+        window.addEventListener('load', moveTabIndicator);
+    });
+
+    window.addEventListener('resize', () => {
+        drawWeightChart(getDailyWeights());
+        drawStepsChart(getDailySteps(), getStepsGoal());
+    });
+
+    let lastKnownToday = getLocalDateStr();
+
+    function checkForDayChange() {
+        const realToday = getLocalDateStr();
+        if (realToday === lastKnownToday) return;
+
+        const dateInput = document.getElementById('checklist-date');
+        if (dateInput && dateInput.value === lastKnownToday) {
+            dateInput.value = realToday;
+            loadDayData(realToday);
+        }
+
+        lastKnownToday = realToday;
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') checkForDayChange();
+    });
+    window.addEventListener('focus', checkForDayChange);
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
